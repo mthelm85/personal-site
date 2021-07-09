@@ -1,17 +1,18 @@
 <template>
-  <v-col cols="12">
+  <v-col>
     <v-row align="center" justify="center" class="fixed-height">
-        <v-col cols="m-6" align="left" justify="auto" class="change-color">
+        <v-col align="left" justify="auto">
           <v-row>
             <v-text class="display-3">Hi! I'm Matt</v-text>
           </v-row>
           <v-row>
-            <v-text class="subtitle-1">Data Scientist, Applied Statistician, Web Developer</v-text>
+            <span class="subtitle-1">Data Scientist, Applied Statistician, Web Developer</span>
           </v-row>
         </v-col>
-        <v-col cols="m-6" align="center" justify="center" class="fixed-height">
+        <v-col align="center" justify="center" class="fixed-height">
           <v-hover
             v-slot="{ hover }"
+            :disabled="hoverBool"
             >
             <v-scale-transition>
                 <v-avatar
@@ -30,18 +31,29 @@
           </v-hover>
         </v-col>
     </v-row>
-    <v-row align="center" justify="center">
-      <h1 class="change-color-link">
-        <NuxtLink style="text-decoration: none; color: inherit;" to="/about">
-          Learn More
-        </NuxtLink>
-      </h1>
-    </v-row>
   </v-col>
 </template>
 
 <script>
   export default {
+    data () {
+      return {
+        width: null
+      }
+    },
+
+    computed: {
+      hoverBool () {
+        switch (this.$vuetify.breakpoint.name) {
+          case 'xs': return true
+          case 'sm': return true
+          case 'md': return true
+          case 'lg': return false
+          case 'xl': return false
+          default: return true
+        }
+      },
+    },
   }
 </script>
 <style>
@@ -49,16 +61,7 @@
     min-height: 270px;
     line-height: 270px;
   }
-  .change-color {
-    color: #d6bc94;
-  }
-  .change-color:hover {
-    color: #fff;
-  }
-  .change-color-link {
-    color: #d6bc94;
-  }
-  .change-color-link:hover {
-    color: #7d521a;
+  a {
+    text-decoration: none;
   }
 </style>

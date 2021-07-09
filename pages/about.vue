@@ -1,22 +1,20 @@
 <template>
   <v-container class="text-center">
-    <v-card flat color="transparent">
+    <v-card flat min-height=600 outlined color="transparent">
       <v-tabs
         v-model="tab"
-        background-color="transparent"
         icons-and-text
-        dark
-        :centered="width < 500 ? false : true"
-        :vertical="width < 500 ? true : false"
+        :centered="!vertical"
+        :vertical="vertical"
       >
         <v-tabs-slider></v-tabs-slider>
 
-        <v-tab href="#tab-1">
+        <v-tab href="#tab-1" outlined color="transparent">
           Summary
           <v-icon>mdi-account</v-icon>
         </v-tab>
 
-        <v-tab href="#tab-2">
+        <v-tab href="#tab-2" class="transparent">
           Programming
           <v-icon>mdi-code-braces</v-icon>
         </v-tab>
@@ -27,23 +25,18 @@
         </v-tab>
       </v-tabs>
 
-      <v-tabs-items v-model="tab">
+      <v-tabs-items v-model="tab" class="transparent">
         <v-tab-item
           v-for="i in 3"
           :key="i"
           :value="'tab-' + i"
         >
-          <v-card flat color="background">
-            <v-card-text class="fixed-height2">{{ items[i-1].text }}</v-card-text>
+          <v-card outlined color="transparent">
+            <v-card-text>{{ items[i-1].text }}</v-card-text>
           </v-card>
         </v-tab-item>
       </v-tabs-items>
     </v-card>
-    <h3 class="change-color-link">
-      <NuxtLink style="text-decoration: none; color: inherit;" to="/timeline">
-        View My Timeline
-      </NuxtLink>
-    </h3>
   </v-container>
 </template>
 
@@ -77,24 +70,25 @@
     }
   },
 
-  updated () {
-    window.addEventListener('resize', this.handleResize())
-    this.handleResize()
+  computed: {
+    vertical () {
+      switch (this.$vuetify.breakpoint.name) {
+        case 'xs': return true
+        case 'sm': return false
+        case 'md': return false
+        case 'lg': return false
+        case 'xl': return false
+        default: return true
+      }
+    },
   },
-
-  beforeDestroy () {
-    window.removeEventListener('resize', this.handleResize())
-  },
-
-  methods: {
-    handleResize () {
-      this.width = window.innerWidth
-    }
-  }
 }
 </script>
 <style>
-.fixed-height2 {
-  min-height: 200px;
+.transparent {
+  background-color: transparent !important;
+}
+.v-tabs-bar {
+  background-color: transparent !important;
 }
 </style>

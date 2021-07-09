@@ -1,6 +1,4 @@
 <template>
-  <v-col cols="12">
-    <v-row>
       <v-container fluid>
         <v-timeline>
         <v-timeline-item
@@ -8,7 +6,7 @@
           :key="i"
           :color="year.color"
         >
-          <template v-slot:opposite>
+          <template #opposite>
             <span
               :class="`headline font-weight-bold ${year.color}--text`"
               v-text="year.year"
@@ -18,17 +16,13 @@
             <h2 :class="`headline font-weight-light mb-4 ${year.color}--text`">
             {{ year.title }}
             </h2>
-            <div class="change-color">
+            <div>
               {{ year.text }}
             </div>
           </div>
         </v-timeline-item>
       </v-timeline>
       </v-container>
-
-    </v-row>
-  </v-col>
-
 </template>
 <script>
   export default {

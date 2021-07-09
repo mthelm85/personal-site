@@ -1,37 +1,40 @@
 <template>
-  <v-col>
-    <v-carousel
-        cycle
-        interval=6000
-        height="400"
-        hide-delimiter-background
-        show-arrows-on-hover
-      >
-        <v-carousel-item
-          v-for="(slide, i) in slides"
-          :key="i"
-          :href="slide.link"
-          target="_blank"
-          eager
+  <v-row justify="center" align="center">
+    <v-card elevation=20>
+      <v-carousel
+          cycle
+          interval=6000
+          height="400"
+          hide-delimiter-background
+          show-arrows-on-hover
         >
-        <v-img
-          :src="slide.src"
-          height="100%"
-          eager
-        >
-        <v-row class="text-center fill-height" align="center" justify="center">
-          <v-col>
-            <span class="display-1">{{ slide.title }}</span>
-          </v-col>
-          <v-col>
-            {{ slide.description }}
-          </v-col>
-        </v-row>
-        </v-img>
+          <v-carousel-item
+            v-for="(slide, i) in slides"
+            :key="i"
+            :href="slide.link"
+            target="_blank"
+            eager
+          >
+          <v-img
+            :src="slide.src"
+            height="100%"
+            eager
+            rounded
+          >
+          <v-row class="text-center fill-height" align="center" justify="center">
+            <v-col>
+              <span class="display-1">{{ slide.title }}</span>
+            </v-col>
+            <v-col>
+              {{ slide.description }}
+            </v-col>
+          </v-row>
+          </v-img>
+          </v-carousel-item>
+        </v-carousel>
+    </v-card>
+  </v-row>
 
-        </v-carousel-item>
-      </v-carousel>
-  </v-col>
 </template>
 
 <script>
@@ -52,7 +55,7 @@ export default {
           },
           {
             title: 'Calculus',
-            description: 'Learn calculus in 15 minutes',
+            description: 'Learn calculus in 30 minutes',
             link: 'https://github.com/mthelm85/CalculusInANutshell',
             src: require('@/assets/calculus.jpg')
           },

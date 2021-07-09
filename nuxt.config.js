@@ -29,6 +29,8 @@ export default {
   plugins: [
   ],
 
+  target: 'static',
+
   // Auto import components: https://go.nuxtjs.dev/config-components
   components: true,
 
@@ -46,8 +48,11 @@ export default {
 
   // Vuetify module configuration: https://go.nuxtjs.dev/config-vuetify
   vuetify: {
-    customVariables: ['~/assets/variables.scss'],
-    treeShake: true,
+    theme: {
+      dark: true
+    },
+    // customVariables: ['~/assets/variables.scss'],
+    // treeShake: true,
     theme: {
       options: {
         customProperties: true
@@ -55,21 +60,22 @@ export default {
       dark: true,
       themes: {
         dark: {
-          background: '#291c07',
-          primary: {
-            base: '#7d521a',
-            lighten5: '#d6bc94'
-          },
-          secondary: {
-            base: '#3b280b',
-            darken1: '#d6bc94'
-          },
-          grey: "#fff",
-          neutralgray: "#fff",
-          accent: {
-            base: '#d6bc94',
-            lighten5: '#d6bc94'
-          }
+          primary: '#8BC34A',
+          accent: '#00BCD4',
+          secondary: '#ffe18d',
+          success: '#4CAF50',
+          info: '#9C27B0',
+          warning: '#FB8C00',
+          error: '#FF5252'
+        },
+        light: {
+          primary: '#1976D2',
+          accent: '#e91e63',
+          secondary: '#30b1dc',
+          success: '#4CAF50',
+          info: '#2196F3',
+          warning: '#FB8C00',
+          error: '#FF5252'
         }
       }
     }

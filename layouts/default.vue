@@ -1,36 +1,47 @@
 <template>
-  <v-app dark>
+  <v-app>
     <v-app-bar
-      color="secondary"
       elevation=24
       app
     >
-    <v-list
-      v-for="(link,i) in links"
-      :key="i"
-      nav
-      dense
-      color="secondary"
-    >
-      <NuxtLink :to="link.to" style="text-decoration: none; color: inherit;">
-        <v-list-item class="mx-0 px-0">
-          <v-list-item-title class="change-color menu-text">
-            {{ link.name }}
-          </v-list-item-title>
-        </v-list-item>
-      </NuxtLink>
-    </v-list>
+    <v-app-bar-nav-icon color="accent" @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
     </v-app-bar>
+    <v-navigation-drawer
+        v-model="drawer"
+        fixed
+        temporary
+        bottom
+        app
+      >
+      <v-list
+        v-for="(link,i) in links"
+        :key="i"
+        nav
+        dense
+      >
+        <NuxtLink :to="link.to">
+          <v-list-item class="mx-0 px-0" ripple>
+            <v-list-item-icon>
+              <v-icon color="accent">{{ link.icon }}</v-icon>
+            </v-list-item-icon>
+            <v-list-item-title class="accent--text">
+              {{ link.name }}
+            </v-list-item-title>
+          </v-list-item>
+        </NuxtLink>
+      </v-list>
+      </v-navigation-drawer>
     <v-main>
-      <v-container align="center" fill-height class="px-6">
+      <v-container align="center" justify="center" fill-height>
         <Nuxt />
       </v-container>
     </v-main>
     <v-footer
-      color="secondary"
+      inset
       app
+      class="justify-center pl-0"
     >
-      <v-col cols="12" class="text-center" style="color: #d6bc94">&copy; {{ new Date().getFullYear() }}</v-col>
+      <v-col cols="12" class="text-center accent--text">&copy; {{ new Date().getFullYear() }}</v-col>
     </v-footer>
   </v-app>
 </template>
@@ -39,20 +50,28 @@
 export default {
   data () {
     return {
+      drawer: false,
+      group: null,
       links: [
-        { name: 'Home', to: '/' },
-        { name: 'About', to: '/about' },
-        { name: 'Timeline', to: '/timeline' },
-        { name: 'Showcase', to: '/showcase' }
+        { name: 'Home', to: '/', icon: 'mdi-home-account' },
+        { name: 'About', to: '/about', icon: 'mdi-information-variant' },
+        { name: 'Timeline', to: '/timeline', icon: 'mdi-timeline-text-outline' },
+        { name: 'Showcase', to: '/showcase', icon: 'mdi-star-face' }
       ],
       title: 'Matt Helm'
     }
-  }
+  },
+
+  watch: {
+      group () {
+        this.drawer = false
+      },
+    },
 }
 </script>
 <style>
-.menu-text {
-  font-family: 'Permanent Marker' !important;
-  font-size: 22px !important;
-}
+/* .v-slide-group__wrapper {
+  display: flex !important;
+  justify-content: center !important;
+} */
 </style>
