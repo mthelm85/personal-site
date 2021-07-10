@@ -32,7 +32,7 @@
           color: 'red',
           year: '2018',
           title: 'Data Scientist',
-          text: 'Began working as a Data Scientist under the Wage & Hour Division\'s national office.'
+          text: 'Began working as a Data Scientist under the Wage & Hour Division\'s national office'
         },
         {
           color: 'orange',
@@ -44,19 +44,19 @@
           color: 'yellow',
           year: '2012',
           title: 'DOL',
-          text: 'Began work at U.S. Department of Labor, Wage & Hour Division.'
+          text: 'Began work at U.S. Department of Labor, Wage & Hour Division'
         },
         {
           color: 'green',
           year: '2010',
           title: 'IRS',
-          text: 'Started work at the Internal Revenue Service.'
+          text: 'Started work at the Internal Revenue Service'
         },
         {
           color: 'blue',
           year: '2009',
           title: 'Bachelor of Science Economics',
-          text: 'Graduated with a Bachelor of Science in Economics from the University of West Florida.'
+          text: 'Graduated with a Bachelor of Science in Economics from the University of West Florida'
         },
       ],
     }),

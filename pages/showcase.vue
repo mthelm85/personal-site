@@ -17,6 +17,7 @@
           >
           <v-img
             :src="slide.src"
+            :lazy-src="slide.lazySrc"
             height="100%"
             eager
             rounded
@@ -50,24 +51,89 @@ export default {
           {
             title: 'County Clustering',
             description: 'Cluster U.S. counties according to industrial similarities',
-            link: 'https://nextjournal.com/matthelm/clustering-counties-within-a-state-based-on-industry-characteristics?token=3mGE1RBypxiHdcg5s8fUwc',
-            src: require('@/assets/globe.jpg')
+            link: 'https://nextjournal.com/matthelm/clustering-counties-within-a-state-based-on-industry-characteristics',
+            src: require('@/assets/globe.jpg'),
+            lazySrc: require('@/assets/globe_lazy.jpg')
           },
           {
             title: 'Calculus',
             description: 'Learn calculus in 30 minutes',
-            link: 'https://github.com/mthelm85/CalculusInANutshell',
-            src: require('@/assets/calculus.jpg')
+            link: null,
+            src: require('@/assets/calculus.jpg'),
+            lazySrc: require('@/assets/calculus_lazy.jpg')
           },
           {
             title: 'Linear Algebra',
             description: 'Linear algebra in a nuthsell',
-            link: 'https://github.com/mthelm85/CalculusInANutshell',
-            src: require('@/assets/matrix.jpg')
+            link: 'https://mybinder.org/v2/gh/mthelm85/LinearAlgebraInANutshell/main?urlpath=pluto/open?path=/home/jovyan/notebooks/notebook.jl',
+            src: require('@/assets/matrix.jpg'),
+            lazySrc: require('@/assets/calculus_lazy.jpg')
           },
         ],
       }
     },
+
+    async mounted () {
+      this.slides[1].link = await this.linkCreator('https://github.com/mthelm85/CalculusInANutshell/blob/main/notebook.jl')
+      this.slides[2].link = await this.linkCreator('https://github.com/mthelm85/LinearAlgebraInANutshell/blob/main/notebook.jl')
+    },
+
+    methods: {
+      async linkCreator (link) {
+        const latestTag = "v0.15.1"
+        const linky = (await this.processPathOrUrl(link)).pathOrUrl
+        return `https://binder.plutojl.org/${await latestTag}/open?url=${encodeURIComponent(encodeURIComponent(linky))}`
+      },
+      gistNormalizer (str) {
+        return str
+          .toLowerCase()
+          .normalize("NFD")
+          .replace(/[^a-z1-9]/g, "")
+      },
+      async processPathOrUrl (pathOrUrl) {
+        try {
+            const u = new URL(pathOrUrl)
+            if (u.host === "gist.github.com") {
+                const parts = u.pathname.substring(1).split("/")
+                const gistId = parts[1]
+                const gist = await (
+                    await fetch(`https://api.github.com/gists/${gistId}`, {
+                        headers: { Accept: "application/vnd.github.v3+json" },
+                    })
+                ).json()
+
+                const files = Object.values(gist.files)
+
+                const selected = files.find((f) => this.gistNormalizer("#file-" + f.filename) === this.gistNormalizer(u.hash))
+                if (selected != null) {
+                    return {
+                      type: "url",
+                      pathOrUrl: selected.raw_url
+                    }
+                }
+
+                return {
+                  type: "url",
+                  pathOrUrl: files[0].raw_url
+                }
+            } else if (u.host === "github.com") {
+              return {
+                type: "url",
+                pathOrUrl: u.href.replace(/\/\/github\.com/, '//raw.githubusercontent.com').replace(/\/blob\//, '/').replace(/\/raw\//, '/'),
+              }
+            }
+            return {
+              type: "url",
+              pathOrUrl: u.href
+            }
+        } catch (ex) {
+            return {
+              type: "url",
+              pathOrUrl
+            }
+        }
+      }
+    }
 }
 </script>
 
