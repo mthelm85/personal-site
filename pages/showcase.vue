@@ -51,7 +51,7 @@ export default {
           {
             title: 'County Clustering',
             description: 'Cluster U.S. counties according to industrial similarities',
-            link: 'https://nextjournal.com/matthelm/clustering-counties-within-a-state-based-on-industry-characteristics',
+            link: null,
             src: require('@/assets/globe.jpg'),
             lazySrc: require('@/assets/globe_lazy.jpg')
           },
@@ -65,7 +65,7 @@ export default {
           {
             title: 'Linear Algebra',
             description: 'Linear algebra in a nuthsell',
-            link: 'https://mybinder.org/v2/gh/mthelm85/LinearAlgebraInANutshell/main?urlpath=pluto/open?path=/home/jovyan/notebooks/notebook.jl',
+            link: null,
             src: require('@/assets/matrix.jpg'),
             lazySrc: require('@/assets/calculus_lazy.jpg')
           },
@@ -76,6 +76,7 @@ export default {
     async mounted () {
       this.slides[1].link = await this.linkCreator('https://github.com/mthelm85/CalculusInANutshell/blob/main/notebook.jl')
       this.slides[2].link = await this.linkCreator('https://github.com/mthelm85/LinearAlgebraInANutshell/blob/main/notebook.jl')
+      this.slides[3].link = await this.linkCreator('https://github.com/mthelm85/CountyClusteringShowcase/blob/main/notebook.jl')
     },
 
     methods: {
