@@ -68,8 +68,15 @@ export default {
             lazySrc: require('@/assets/calculus_lazy.jpg')
           },
           {
-            title: 'Linear Algebra',
-            description: 'Linear algebra in a nuthsell',
+            title: 'Linear Algebra Part I',
+            description: 'Learn about vectors and scalars',
+            link: null,
+            src: require('@/assets/matrix.jpg'),
+            lazySrc: require('@/assets/calculus_lazy.jpg')
+          },
+                    {
+            title: 'Linear Algebra Part II',
+            description: 'Learn about matrices',
             link: null,
             src: require('@/assets/matrix.jpg'),
             lazySrc: require('@/assets/calculus_lazy.jpg')
@@ -82,6 +89,7 @@ export default {
       this.slides[0].link = await this.linkCreator('https://github.com/mthelm85/CountyClusteringShowcase/blob/main/notebook.jl')
       this.slides[1].link = await this.linkCreator('https://github.com/mthelm85/CalculusInANutshell/blob/main/notebook.jl')
       this.slides[2].link = await this.linkCreator('https://github.com/mthelm85/LinearAlgebraInANutshell/blob/main/notebook.jl')
+      this.slides[3].link = await this.linkCreator('https://github.com/mthelm85/LinearAlgebraInANutshell/blob/main/notebook2.jl')
     },
 
     methods: {

@@ -5,6 +5,21 @@
       app
     >
     <v-app-bar-nav-icon color="accent" @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
+        <v-spacer></v-spacer>
+        <v-btn
+          icon
+          href="https://github.com/mthelm85/"
+          target="_blank"
+        >
+          <v-icon color="accent">mdi-github</v-icon>
+        </v-btn>
+        <v-btn
+          icon
+          href="https://mobile.twitter.com/MattTheHelm"
+          target="_blank"
+        >
+            <v-icon color="accent">mdi-twitter</v-icon>
+          </v-btn>
     </v-app-bar>
     <v-navigation-drawer
         v-model="drawer"
