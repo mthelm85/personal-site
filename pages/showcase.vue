@@ -1,39 +1,44 @@
 <template>
   <v-row justify="center" align="center">
-    <v-card elevation=20>
-      <v-carousel
-          cycle
-          interval=6000
-          height="400"
-          hide-delimiter-background
-          show-arrows-on-hover
-        >
-          <v-carousel-item
-            v-for="(slide, i) in slides"
-            :key="i"
-            :href="slide.link"
-            target="_blank"
-            eager
-          >
-          <v-img
-            :src="slide.src"
-            :lazy-src="slide.lazySrc"
-            height="100%"
-            eager
-            rounded
-          >
-          <v-row class="text-center fill-height" align="center" justify="center">
-            <v-col>
-              <span class="display-1">{{ slide.title }}</span>
-            </v-col>
-            <v-col>
-              {{ slide.description }}
-            </v-col>
-          </v-row>
-          </v-img>
-          </v-carousel-item>
-        </v-carousel>
-    </v-card>
+    <v-tooltip top>
+      <template #activator="{ on, attrs }">
+        <v-card elevation=20 v-bind="attrs" v-on="on">
+          <v-carousel
+              cycle
+              interval=6000
+              height="400"
+              hide-delimiter-background
+              show-arrows-on-hover
+            >
+              <v-carousel-item
+                v-for="(slide, i) in slides"
+                :key="i"
+                :href="slide.link"
+                target="_blank"
+                eager
+              >
+              <v-img
+                :src="slide.src"
+                :lazy-src="slide.lazySrc"
+                height="100%"
+                eager
+                rounded
+              >
+              <v-row class="text-center fill-height" align="center" justify="center">
+                <v-col>
+                  <span class="display-1">{{ slide.title }}</span>
+                </v-col>
+                <v-col>
+                  {{ slide.description }}
+                </v-col>
+              </v-row>
+              </v-img>
+              </v-carousel-item>
+            </v-carousel>
+        </v-card>
+      </template>
+      <span>Note: The showcase products are Pluto notebooks (Julia) running on Binder. They take several minutes to fully load.</span>
+    </v-tooltip>
   </v-row>
 
 </template>

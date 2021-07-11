@@ -29,9 +29,9 @@ export default {
   plugins: [
   ],
   mode: 'spa',
-  router: {
-     base: '/personal-site/'
-   },
+  // router: {
+  //    base: '/personal-site/'
+  //  },
   target: 'static',
 
   // Auto import components: https://go.nuxtjs.dev/config-components
