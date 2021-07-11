@@ -74,9 +74,9 @@ export default {
     },
 
     async mounted () {
+      this.slides[0].link = await this.linkCreator('https://github.com/mthelm85/CountyClusteringShowcase/blob/main/notebook.jl')
       this.slides[1].link = await this.linkCreator('https://github.com/mthelm85/CalculusInANutshell/blob/main/notebook.jl')
       this.slides[2].link = await this.linkCreator('https://github.com/mthelm85/LinearAlgebraInANutshell/blob/main/notebook.jl')
-      this.slides[3].link = await this.linkCreator('https://github.com/mthelm85/CountyClusteringShowcase/blob/main/notebook.jl')
     },
 
     methods: {
