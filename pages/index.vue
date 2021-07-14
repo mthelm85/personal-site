@@ -20,11 +20,11 @@
                   class="transition-fast-in-fast-out"
                 >
                   <v-img
+                    :lazy-src="require('@/assets/calculus_lazy.jpg')"
                     :src="require('@/assets/profile.jpg')"
                     height="290px"
                     :aspect-ratio="13/16"
                     contain
-                    eager
                   ></v-img>
                 </v-avatar>
             </v-scale-transition>

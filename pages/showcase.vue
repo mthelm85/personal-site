@@ -12,7 +12,7 @@
         class="white--text align-center justify-end"
         :src="slide.src"
         :lazy-src="slide.lazySrc"
-        max-height=640
+        max-height=540
         >
         <v-card-title class="text-md-h2">{{ slide.title }}</v-card-title>
         </v-img>
@@ -67,7 +67,7 @@ export default {
             link: 'https://www.matthelm.pro/clusteringStatic.html',
             // linkInteractive: null,
             src: require('@/assets/globe.jpg'),
-            lazySrc: require('@/assets/globe_lazy.jpg')
+            lazySrc: require('@/assets/calculus_lazy.jpg')
           },
           {
             title: 'Calculus',

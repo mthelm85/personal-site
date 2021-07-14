@@ -1,5 +1,3 @@
-import colors from 'vuetify/es5/util/colors'
-
 export default {
   // Global page headers: https://go.nuxtjs.dev/config-head
   head: {
@@ -55,7 +53,7 @@ export default {
       dark: true
     },
     // customVariables: ['~/assets/variables.scss'],
-    // treeShake: true,
+    treeShake: true,
     theme: {
       options: {
         customProperties: true
@@ -86,5 +84,6 @@ export default {
 
   // Build Configuration: https://go.nuxtjs.dev/config-build
   build: {
+    // analyze: true
   }
 }
