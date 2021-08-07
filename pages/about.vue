@@ -51,7 +51,7 @@
             href: "#tab-0",
             title: "Recents",
             icon: "mdi-account",
-            text: 'I\'m into data science, math, statistics, windsurfing, music, and Manchester United FC. I currently work as a Data Scientist at the U.S. Department of Labor where I lead and manage a diverse portfolio of projects that leverage statistical analysis and a variety of machine learning techniques. In addition to my data science skills, I\'m a skilled web developer and software engineer.'
+            text: 'I\'m into data science, math, statistics, windsurfing, music, and Manchester United FC. I currently work as a Data Scientist at the U.S. Department of Labor where I lead and manage a diverse portfolio of projects that leverage a variety of statistical and machine learning techniques. In addition to my data science skills, I\'m a skilled web developer and software engineer.'
           },
           {
             href: "#tab-1",
