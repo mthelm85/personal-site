@@ -19,7 +19,14 @@
           target="_blank"
         >
             <v-icon color="accent">mdi-twitter</v-icon>
-          </v-btn>
+        </v-btn>
+        <v-btn
+          v-if="webShareSupported"
+          icon
+          @click="share"
+        >
+          <v-icon color="accent">mdi-share-variant</v-icon>
+        </v-btn>
     </v-app-bar>
     <v-navigation-drawer
         v-model="drawer"
@@ -77,11 +84,27 @@ export default {
     }
   },
 
-  watch: {
+  computed: {
+    webShareSupported () {
+      return navigator.share
+    }
+  },
+
+    watch: {
       group () {
         this.drawer = false
       },
     },
+
+  methods: {
+    share () {
+      navigator.share({
+        title: 'Matt Helm',
+        text: 'I thought you might be interested in learning about Matt. He\'s a data scientist, applied statistician, and developer!',
+        url: 'https://www.matthelm.pro'
+      })
+    }
+  }
 }
 </script>
 <style>
