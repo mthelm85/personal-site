@@ -61,6 +61,15 @@ export default {
       return {
         slides: [
           {
+            title: 'Bayesian Regression With an Ordered Categorical Predictor Variable',
+            description: 'Bayesian regression analysis of the incremental effects of educational attainment on income.',
+            tools: 'Julia and the Turing probabilistic programming language.',
+            link: 'https://forem.julialang.org/mthelm85/bayesian-regression-with-an-ordered-categorical-predictor-variable-ejc',
+            // linkInteractive: null,
+            src: require('@/assets/money.jpg'),
+            lazySrc: require('@/assets/calculus_lazy.jpg')
+          },
+          {
             title: 'County Clustering',
             description: 'Clusters U.S. counties within a state according to industrial similarities.',
             tools: 'Pluto notebook powered by the Julia programming language, running on Binder. Leverages the k-medoids and fuzzy c-means clustering algorithms. For the interactive version, click the \'Edit or run this notebook\' option after opening.',
