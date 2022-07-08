@@ -91,7 +91,7 @@ export default {
             title: 'Linear Algebra Part I',
             description: 'Learn about vectors and scalars. For the interactive version, click the \'Edit or run this notebook\' option after opening.',
             tools: 'Pluto notebook powered by the Julia programming language, running on Binder.',
-            link: 'https://www.matthelm.pro/linAlgStatic.html',
+            link: 'https://www.matthelm.pro/linAlgStatic2.html',
             // linkInteractive: null,
             src: require('@/assets/matrix.jpg'),
             lazySrc: require('@/assets/calculus_lazy.jpg')
