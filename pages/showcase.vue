@@ -106,6 +106,14 @@ export default {
             lazySrc: require('@/assets/calculus_lazy.jpg')
           },
           {
+            title: 'The Travelling Salesman Game',
+            description: 'The travelling salesman problem, as an arcade game.',
+            tools: 'JavaScript, HTML, Phaser.js game engine. Each level is generated randomly and then solved with simulated annealing. Calculates Euclidean distance between points.',
+            link: 'https://mthelm85.github.io/travelling-salesman-game/',
+            src: require('@/assets/roadmap.jpg'),
+            lazySrc: require('@/assets/calculus_lazy.jpg')
+          },
+          {
             title: 'County Business Patterns',
             description: 'Interactive tool for exploring the U.S. Census Bureau\'s County Business Patterns data set.',
             tools: 'Built with Vue.js and Vuetify. Accepts user inputs to formulate calls to the Census CBP API and then renders a choropleth map with Leaflet.js.',    
