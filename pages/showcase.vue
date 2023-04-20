@@ -70,6 +70,15 @@ export default {
             lazySrc: require('@/assets/calculus_lazy.jpg')
           },
           {
+            title: 'Kernel Density Estimation',
+            description: 'A brief primer on Kernel Density Estimation.',
+            tools: 'JavaScript running in an Observable notebook.',
+            link: 'https://observablehq.com/d/bf068f6a5c4da2ce',
+            // linkInteractive: null,
+            src: require('@/assets/bell_curve.jpg'),
+            lazySrc: require('@/assets/calculus_lazy.jpg')
+          },
+          {
             title: 'County Clustering',
             description: 'Clusters U.S. counties within a state according to industrial similarities.',
             tools: 'Pluto notebook powered by the Julia programming language, running on Binder. Leverages the k-medoids and fuzzy c-means clustering algorithms. For the interactive version, click the \'Edit or run this notebook\' option after opening.',
