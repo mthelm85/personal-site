@@ -131,15 +131,6 @@ export default {
             src: require('@/assets/census.jpg'),
             lazySrc: require('@/assets/calculus_lazy.jpg')
           },
-            {
-            title: 'Pensacola Sail Club',
-            description: 'Windsurfing club website.',
-            tools: 'Built with Vue.js and Vuetify. Displays a Leaflet.js map with the Windy.com plugin. Fetches local wind/gust data from the openweathermap.org API and displays in a custom Chart.js chart.',    
-            link: 'https://www.pensacolasail.club/',
-            // linkInteractive: 'https://www.pensacolasail.club/',
-            src: require('@/assets/windsurf.jpg'),
-            lazySrc: require('@/assets/calculus_lazy.jpg')
-          },
         ],
       }
     },

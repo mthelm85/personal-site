@@ -13,13 +13,6 @@
         >
           <v-icon color="accent">mdi-github</v-icon>
         </v-btn>
-        <!-- <v-btn
-          icon
-          href="https://mobile.twitter.com/MattTheHelm"
-          target="_blank"
-        >
-            <v-icon color="accent">mdi-twitter</v-icon>
-        </v-btn> -->
         <v-btn
           v-if="webShareSupported"
           icon
