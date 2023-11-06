@@ -79,6 +79,14 @@ export default {
             lazySrc: require('@/assets/calculus_lazy.jpg')
           },
           {
+            title: 'Gig Harbor Real Estate Data',
+            description: 'A data dashboard providing an overview of publicly-available housing market data for the city of Gig Harbor, WA.',
+            tools: 'Julia for data wrangling, ApexCharts for visualization, and Vue/Vuetify for site UI.',
+            link: 'https://gh-housing-data.vercel.app/',
+            src: require('@/assets/houses.jpg'),
+            lazySrc: require('@/assets/calculus_lazy.jpg')
+          },
+          {
             title: 'County Clustering',
             description: 'Clusters U.S. counties within a state according to industrial similarities.',
             tools: 'Pluto notebook powered by the Julia programming language, running on Binder. Leverages the k-medoids and fuzzy c-means clustering algorithms. For the interactive version, click the \'Edit or run this notebook\' option after opening.',
