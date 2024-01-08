@@ -6,7 +6,7 @@
             <v-text class="display-3">Hi! I'm Matt</v-text>
           </v-row>
           <v-row>
-            <span class="subtitle-1">Data Scientist, Applied Statistician, Developer</span>
+            <span class="subtitle-1">I solve problems using data, statistics & aritificial intelligence</span>
           </v-row>
         </v-col>
         <v-col align="center" justify="center" class="fixed-height">
