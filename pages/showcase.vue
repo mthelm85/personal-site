@@ -79,11 +79,11 @@ export default {
             lazySrc: require('@/assets/calculus_lazy.jpg')
           },
           {
-            title: 'Gig Harbor Real Estate Data',
-            description: 'A data dashboard providing an overview of publicly-available housing market data for the city of Gig Harbor, WA.',
-            tools: 'Julia for data wrangling, ApexCharts for visualization, and Vue/Vuetify for site UI.',
-            link: 'https://gh-housing-data.vercel.app/',
-            src: require('@/assets/houses.jpg'),
+            title: 'Optimal Meatballs',
+            description: 'Learn about circle packing by optimizing the size of meatballs! 🍝',
+            tools: 'Pluto notebook powered by the Julia programming language. A featured notebook on plutojl.org.',
+            link: 'https://featured.plutojl.org/puzzles-games/optimal%20meatballs',
+            src: require('@/assets/meatballs.jpg'),
             lazySrc: require('@/assets/calculus_lazy.jpg')
           },
           {
