@@ -131,12 +131,11 @@ export default {
             lazySrc: require('@/assets/calculus_lazy.jpg')
           },
           {
-            title: 'County Business Patterns',
-            description: 'Interactive tool for exploring the U.S. Census Bureau\'s County Business Patterns data set.',
-            tools: 'Built with Vue.js and Vuetify. Accepts user inputs to formulate calls to the Census CBP API and then renders a choropleth map with Leaflet.js.',    
-            link: 'https://census-cbp.herokuapp.com/',
-            // linkInteractive: 'https://census-cbp.herokuapp.com/',
-            src: require('@/assets/census.jpg'),
+            title: 'Fuzzy Joiner',
+            description: 'Perform fuzzy joins on two tables.',
+            tools: 'Built with Vue.js and Vuetify. The larger of the two data sets is used to build a Burkhard-Keller tree for efficient nearest neighbor searches, using the Levenshtein edit distance. This part of the application is written in Rust and compiled to WebAssembly.',    
+            link: 'https://fuzzy-joiner.vercel.app/',
+            src: require('@/assets/fuzzy_join.png'),
             lazySrc: require('@/assets/calculus_lazy.jpg')
           },
         ],
