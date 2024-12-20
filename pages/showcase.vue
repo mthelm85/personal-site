@@ -61,6 +61,14 @@ export default {
       return {
         slides: [
           {
+            title: '',
+            description: 'A blog focusing on interesting and unique data sources.',
+            tools: 'Vue.js, Nuxt.js, Julia for data manipulation and analysis, Chart.js for data visualization.',
+            link: 'https://www.thedatadispatch.com',
+            src: require('@/assets/data_dispatch.png'),
+            lazySrc: require('@/assets/calculus_lazy.jpg')
+          },
+          {
             title: 'Bayesian Regression With an Ordered Categorical Predictor Variable',
             description: 'Bayesian regression analysis of the incremental effects of educational attainment on income.',
             tools: 'Julia and the Turing probabilistic programming language.',
