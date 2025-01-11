@@ -87,6 +87,14 @@ export default {
             lazySrc: require('@/assets/calculus_lazy.jpg')
           },
           {
+            title: '',
+            description: 'A physics-based puzzle game challenging players to navigate a spacecraft through complex gravitational fields using realistic n-body gravitational simulations.',
+            tools: 'Phaser.js, Vue.js, JavaScript',
+            link: 'https://homeward-bound-game.vercel.app/',
+            src: require('@/assets/homeward_bound.png'),
+            lazySrc: require('@/assets/calculus_lazy.jpg')
+          },
+          {
             title: 'Optimal Meatballs',
             description: 'Learn about circle packing by optimizing the size of meatballs! 🍝',
             tools: 'Pluto notebook powered by the Julia programming language. A featured notebook on plutojl.org.',
