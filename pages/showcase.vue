@@ -151,7 +151,7 @@ export default {
             description: 'Perform fuzzy joins on two tables.',
             tools: 'Built with Vue.js and Vuetify. The larger of the two data sets is used to build a Burkhard-Keller tree for efficient nearest neighbor searches, using the Levenshtein edit distance. This part of the application is written in Rust and compiled to WebAssembly.',    
             link: 'https://fuzzy-joiner.vercel.app/',
-            src: require('@/assets/fuzzy_join.png'),
+            src: require('@/assets/chain.jpg'),
             lazySrc: require('@/assets/calculus_lazy.jpg')
           },
         ],
