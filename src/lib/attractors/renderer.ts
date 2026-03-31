@@ -288,7 +288,6 @@ export class AttractorRenderer {
 		const dpr = Math.min(window.devicePixelRatio || 1, 2);
 		this.canvas.width = Math.round(this.canvas.clientWidth * dpr);
 		this.canvas.height = Math.round(this.canvas.clientHeight * dpr);
-		this.ctx.scale(dpr, dpr);
 		this.dj = createDeJongState();
 		this.cl = createCliffordState();
 		this.lz = createLorenzState();

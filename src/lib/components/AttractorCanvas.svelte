@@ -130,6 +130,6 @@
 <canvas
 	bind:this={canvas}
 	class="fixed inset-0 pointer-events-none"
-	style="z-index: 0; width: 100vw; height: 100vh;"
+	style="z-index: 0;"
 	aria-hidden="true"
 ></canvas>
