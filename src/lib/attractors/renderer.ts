@@ -86,9 +86,8 @@ export class AttractorRenderer {
 		this.frameCount = 0;
 		this.flowFieldFn = fn;
 		if (fn) {
-			const dpr = Math.min(window.devicePixelRatio || 1, 2);
-			const w = this.canvas.width / dpr;
-			const h = this.canvas.height / dpr;
+			const w = this.canvas.width;
+			const h = this.canvas.height;
 			this.flowPoints = Array.from({ length: 300 }, () => ({
 				x: Math.random() * w,
 				y: Math.random() * h,
@@ -124,9 +123,8 @@ export class AttractorRenderer {
 	}
 
 	private plotPoint(nx: number, ny: number, warm: boolean) {
-		const dpr = Math.min(window.devicePixelRatio || 1, 2);
-		const w = this.canvas.width / dpr;
-		const h = this.canvas.height / dpr;
+		const w = this.canvas.width;
+		const h = this.canvas.height;
 
 		let cx: number, cy: number;
 		if (this.cur.type === 'lorenz') {
@@ -169,9 +167,8 @@ export class AttractorRenderer {
 	private renderFlowField() {
 		if (!this.flowFieldFn) return;
 		const fn = this.flowFieldFn;
-		const dpr = Math.min(window.devicePixelRatio || 1, 2);
-		const w = this.canvas.width / dpr;
-		const h = this.canvas.height / dpr;
+		const w = this.canvas.width;
+		const h = this.canvas.height;
 
 		this.ctx.fillStyle = 'rgba(8,8,15,0.02)';
 		this.ctx.fillRect(0, 0, w, h);
@@ -226,9 +223,8 @@ export class AttractorRenderer {
 		this.lerpParams();
 		this.renderAttractor();
 
-		const dpr = Math.min(window.devicePixelRatio || 1, 2);
-		const w = this.canvas.width / dpr;
-		const h = this.canvas.height / dpr;
+		const w = this.canvas.width;
+		const h = this.canvas.height;
 
 		this.ctx.fillStyle = 'rgba(8,8,15,0.004)';
 		this.ctx.fillRect(0, 0, w, h);
