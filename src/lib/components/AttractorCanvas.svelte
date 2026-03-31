@@ -45,10 +45,8 @@
 		sectionLabels.set(labels);
 
 		const dpr = Math.min(window.devicePixelRatio || 1, 2);
-		canvas.width = Math.round(window.innerWidth * dpr);
-		canvas.height = Math.round(window.innerHeight * dpr);
-		canvas.style.width = window.innerWidth + 'px';
-		canvas.style.height = window.innerHeight + 'px';
+		canvas.width = Math.round(canvas.clientWidth * dpr);
+		canvas.height = Math.round(canvas.clientHeight * dpr);
 
 		const iters = getIterationsPerFrame(getPerformanceTier());
 		renderer = new AttractorRenderer(canvas, visuals.attractors['hero'], iters);

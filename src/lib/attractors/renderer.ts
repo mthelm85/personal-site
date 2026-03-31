@@ -286,10 +286,8 @@ export class AttractorRenderer {
 
 	resize() {
 		const dpr = Math.min(window.devicePixelRatio || 1, 2);
-		this.canvas.width = Math.round(window.innerWidth * dpr);
-		this.canvas.height = Math.round(window.innerHeight * dpr);
-		this.canvas.style.width = window.innerWidth + 'px';
-		this.canvas.style.height = window.innerHeight + 'px';
+		this.canvas.width = Math.round(this.canvas.clientWidth * dpr);
+		this.canvas.height = Math.round(this.canvas.clientHeight * dpr);
 		this.ctx.scale(dpr, dpr);
 		this.dj = createDeJongState();
 		this.cl = createCliffordState();
