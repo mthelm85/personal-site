@@ -17,7 +17,7 @@ export const PROJECTS: Project[] = [
 	{
 		title: 'CheckMate.jl',
 		description:
-			'A robust data validation framework for production-grade economic pipelines. Used internally at DOL for data and systems validation.',
+			'A robust data valiA lightweight data validation framework for Julia, designed to help you define, run, and manage data quality checks on tabular data.',
 		tech: ['Julia', 'Data Validation', 'ETL'],
 		github: 'https://github.com/mthelm85/CheckMate.jl'
 	},
