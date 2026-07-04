@@ -3,8 +3,11 @@
 	import { PCFShadowMap } from 'three';
 	import { Canvas } from '@threlte/core';
 	import Scene from './Scene.svelte';
+	import LandingOverlay from './ui/LandingOverlay.svelte';
+	import Panel from './ui/Panel.svelte';
 	import { probeCapability } from './capability';
 	import { garden } from './state.svelte';
+	import { nav } from './nav.svelte';
 
 	onMount(async () => {
 		const report = await probeCapability();
@@ -36,6 +39,15 @@
 			<Scene />
 		</Canvas>
 	</div>
+
+	{#if !garden.entered}
+		<LandingOverlay />
+	{:else}
+		<Panel />
+		{#if !garden.panel && !nav.traveling}
+			<p class="hint">Click a glowing marker to walk — or tap Tab, then Enter</p>
+		{/if}
+	{/if}
 {/if}
 
 <style>
@@ -56,5 +68,22 @@
 		text-align: center;
 		gap: 0.5rem;
 		padding: 2rem;
+	}
+
+	.hint {
+		position: fixed;
+		bottom: 1.4rem;
+		left: 50%;
+		transform: translateX(-50%);
+		margin: 0;
+		font-size: 0.82rem;
+		font-weight: 600;
+		color: #2c3a2f;
+		background: color-mix(in srgb, #fffdf5 85%, transparent);
+		border: 1px solid #e5dcc3;
+		border-radius: 999px;
+		padding: 0.45rem 1.1rem;
+		z-index: 10;
+		pointer-events: none;
 	}
 </style>

@@ -10,6 +10,9 @@
 	import Hedge from './Hedge.svelte';
 	import CameraRig from './CameraRig.svelte';
 	import Waypoints from './Waypoints.svelte';
+	import Shed from './Shed.svelte';
+	import NoticeBoard from './NoticeBoard.svelte';
+	import Placard from './Placard.svelte';
 
 	interactivity();
 
@@ -45,7 +48,6 @@
 		{ x: 32, z: 10, s: 2.4, c: '#35864a' }
 	].map((tr) => ({ ...tr, y: terrainHeight(tr.x, tr.z) }));
 
-	const shedY = terrainHeight(-5, 2);
 	const sapY = terrainHeight(0, 0);
 </script>
 
@@ -104,20 +106,16 @@
 	</T.Group>
 {/each}
 
-<!-- Potting-shed placeholder (modeled properly in M3) -->
-<T.Group position={[-5, shedY, 2]} rotation.y={0.5}>
-	<T.Mesh position.y={0.75} castShadow={full} onclick={() => nav.walkTo('shed')} {...walkCursor}>
-		<T.BoxGeometry args={[2.2, 1.5, 1.8]} />
-		<T.MeshStandardMaterial color="#e8b04b" flatShading />
-	</T.Mesh>
-	<T.Mesh
-		position.y={1.85}
-		rotation.y={Math.PI / 4}
-		castShadow={full}
-		onclick={() => nav.walkTo('shed')}
-		{...walkCursor}
-	>
-		<T.ConeGeometry args={[1.7, 0.9, 4]} />
-		<T.MeshStandardMaterial color="#c95b3f" flatShading />
-	</T.Mesh>
-</T.Group>
+<Shed />
+<NoticeBoard />
+
+<!-- The sapling's botanical placard -->
+<Placard
+	x={1.1}
+	z={1.3}
+	yaw={Math.atan2(3.4 - 1.1, 3.0 - 1.3)}
+	onactivate={() => {
+		nav.walkTo('sapling');
+		garden.panel = 'placard:sapling';
+	}}
+/>

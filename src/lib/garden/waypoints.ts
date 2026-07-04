@@ -21,6 +21,7 @@ export const EYE_HEIGHT = 1.85;
 
 export const WAYPOINTS: Waypoint[] = [
 	{ id: 'gate', x: 13.8, z: 16.4, look: [0, 1.2, 0], label: 'Garden gate' },
+	{ id: 'board', x: 10.6, z: 12.6, look: [12.4, 1.5, 11.4], label: 'Notice board' },
 	{ id: 'path', x: 8.2, z: 9.2, look: [0, 1.3, 0], label: 'Garden path' },
 	{ id: 'sapling', x: 3.4, z: 3.0, look: [0, 1.4, 0], label: 'The sapling' },
 	{ id: 'pond', x: 10.2, z: 0.2, look: [7.5, -0.1, -5.5], label: 'Pond shore' },
@@ -30,6 +31,8 @@ export const WAYPOINTS: Waypoint[] = [
 
 export const EDGES: [string, string][] = [
 	['gate', 'path'],
+	['gate', 'board'],
+	['board', 'path'],
 	['path', 'sapling'],
 	['path', 'pond'],
 	['sapling', 'pond'],
