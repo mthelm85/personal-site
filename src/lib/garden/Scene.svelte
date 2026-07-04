@@ -5,7 +5,6 @@
 	import { terrainHeight, COLORS, SUN_DIR } from './terrain';
 	import { nav } from './nav.svelte';
 	import Terrain from './Terrain.svelte';
-	import Grass from './Grass.svelte';
 	import Sky from './Sky.svelte';
 	import Pond from './Pond.svelte';
 	import Hedge from './Hedge.svelte';
@@ -75,7 +74,6 @@
 />
 
 <Terrain />
-<Grass {fogNear} {fogFar} />
 <Pond />
 <Hedge />
 
