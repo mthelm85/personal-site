@@ -97,9 +97,10 @@ list.
 - **M0 — Foundation.** Branch, Threlte setup, capability probe. Straight into
   3D — no flat site first (Matt's explicit call: motivation lives in the 3D
   work). Old site untouched on main.
-- **M1 — The shell.** Terrain, hedge/fence boundary, sky, lighting, stylized
-  grass shader (instanced blades + wind), pond water shader. Static camera.
-  Performance validated on mid hardware + one real phone before proceeding.
+- **M1 — The shell.** Terrain, hedge/fence boundary, sky, lighting, pond
+  water shader. Static camera. ~~Stylized grass shader~~ (built, then cut
+  2026-07-04: not worth the complexity/noise — vertex-colored terrain
+  carries the meadow). Mobile perf gate waived; desktop-first for now.
 - **M2 — Walking.** Waypoint graph, click/tap-to-walk, camera easing + arrival
   behavior, hover states, keyboard path. The garden *feels like navigation*
   here or we stop and fix it.
@@ -118,8 +119,8 @@ list.
 
 - First meaningful paint of the loader < 1s on cable; total v1 payload ≤ ~6 MB.
 - 60 fps on a mid-2020s laptop iGPU at tier full; 30+ fps tier reduced on a
-  mid-range phone.
-- Grass via instancing only; DPR capped at 2; no shadow maps below tier full.
+  mid-range phone (deferred — desktop-first per Matt, revisit at M6).
+- DPR capped at 2; no shadow maps below tier full.
 
 ## Backlog (v2+, in no order — each is one specimen module)
 
@@ -138,8 +139,6 @@ list.
 
 - **Blender ramp-up** for the shed/props — mitigate with CC0 low-poly packs
   (Kenney, Quaternius) restyled to palette, or keep v1 props primitive-based.
-- **Grass shader** is the highest-skill shader item; budget real time or buy/
-  adapt an open implementation and restyle.
 - **Scope creep at the craft bar** — the bar applies to what ships, not to how
   much ships. Cut objects, never polish.
 - Audio licensing: CC0 only, keep a sources list.
