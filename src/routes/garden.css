@@ -1,0 +1,31 @@
+@import 'tailwindcss';
+
+/* ─── Garden design tokens (bright, storybook daylight) ───────── */
+@theme {
+	--color-sky: #aee1f9;
+	--color-meadow: #7ec850;
+	--color-soil: #8a5a3b;
+	--color-sun: #ffd97a;
+	--color-ink: #2c3a2f;
+
+	--font-sans: 'Nunito', 'Segoe UI', system-ui, sans-serif;
+}
+
+*,
+*::before,
+*::after {
+	box-sizing: border-box;
+}
+
+html,
+body {
+	margin: 0;
+	height: 100%;
+}
+
+body {
+	background: #aee1f9;
+	color: #2c3a2f;
+	font-family: 'Nunito', 'Segoe UI', system-ui, sans-serif;
+	overflow: hidden;
+}

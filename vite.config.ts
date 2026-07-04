@@ -6,5 +6,11 @@ export default defineConfig({
 	plugins: [tailwindcss(), sveltekit()],
 	optimizeDeps: {
 		include: ['mathjs']
+	},
+	resolve: {
+		dedupe: ['three']
+	},
+	ssr: {
+		noExternal: ['three', '@threlte/core', '@threlte/extras']
 	}
 });
