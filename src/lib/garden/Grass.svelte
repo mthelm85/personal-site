@@ -10,6 +10,7 @@
 		POND,
 		GARDEN_RADIUS
 	} from './terrain';
+	import { WAYPOINTS } from './waypoints';
 
 	let { fogNear = 24, fogFar = 60 }: { fogNear?: number; fogFar?: number } = $props();
 
@@ -38,6 +39,8 @@
 			// Keep blades out of the pond bowl and the shed footprint.
 			if (Math.hypot(x - POND.x, z - POND.z) < POND.r + 1.0) continue;
 			if (x > -6.6 && x < -3.4 && z > 0.7 && z < 3.3) continue;
+			// Clearings around waypoints so the markers stay visible.
+			if (WAYPOINTS.some((w) => Math.hypot(x - w.x, z - w.z) < 1.0)) continue;
 
 			offsets[placed * 3] = x;
 			offsets[placed * 3 + 1] = terrainHeight(x, z) - 0.02;

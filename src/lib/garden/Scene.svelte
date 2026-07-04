@@ -1,12 +1,18 @@
 <script lang="ts">
 	import { T, useTask } from '@threlte/core';
+	import { interactivity } from '@threlte/extras';
 	import { garden } from './state.svelte';
-	import { terrainHeight, COLORS, SUN_DIR, GATE_ANGLE, GARDEN_RADIUS } from './terrain';
+	import { terrainHeight, COLORS, SUN_DIR } from './terrain';
+	import { nav } from './nav.svelte';
 	import Terrain from './Terrain.svelte';
 	import Grass from './Grass.svelte';
 	import Sky from './Sky.svelte';
 	import Pond from './Pond.svelte';
 	import Hedge from './Hedge.svelte';
+	import CameraRig from './CameraRig.svelte';
+	import Waypoints from './Waypoints.svelte';
+
+	interactivity();
 
 	const full = $derived(garden.tier === 'full');
 
@@ -14,11 +20,11 @@
 	const fogNear = $derived(full ? 34 : 20);
 	const fogFar = $derived(full ? 85 : 52);
 
-	// Camera looks in through the gate. Static until M2 brings walking.
-	const camDist = 21;
-	const camX = Math.cos(GATE_ANGLE) * camDist;
-	const camZ = Math.sin(GATE_ANGLE) * camDist;
-	const camY = terrainHeight(camX, camZ) + 4.6;
+	// Clicking a specimen walks to its waypoint.
+	const walkCursor = {
+		onpointerenter: () => (document.body.style.cursor = 'pointer'),
+		onpointerleave: () => (document.body.style.cursor = 'default')
+	};
 
 	// Gentle sway on the sapling proves the render loop is alive.
 	let sway = $state(0);
@@ -47,12 +53,8 @@
 <T.Color attach="background" args={[COLORS.sky.horizon.getHex()]} />
 <T.Fog attach="fog" args={[COLORS.fog.getHex(), fogNear, fogFar]} />
 
-<T.PerspectiveCamera
-	makeDefault
-	position={[camX, camY, camZ]}
-	fov={45}
-	oncreate={(cam) => cam.lookAt(-2, 0.6, -2)}
-/>
+<CameraRig />
+<Waypoints />
 
 <Sky />
 
@@ -79,12 +81,12 @@
 
 <!-- Sapling: trunk + swaying crown (the Galton–Watson tree arrives in M4) -->
 <T.Group position={[0, sapY, 0]}>
-	<T.Mesh position.y={0.6} castShadow={full}>
+	<T.Mesh position.y={0.6} castShadow={full} onclick={() => nav.walkTo('sapling')} {...walkCursor}>
 		<T.CylinderGeometry args={[0.12, 0.18, 1.2, 7]} />
 		<T.MeshStandardMaterial color="#8a5a3b" flatShading />
 	</T.Mesh>
 	<T.Group position.y={1.2} rotation.z={sway}>
-		<T.Mesh position.y={0.9} castShadow={full}>
+		<T.Mesh position.y={0.9} castShadow={full} onclick={() => nav.walkTo('sapling')} {...walkCursor}>
 			<T.ConeGeometry args={[1.0, 1.8, 8]} />
 			<T.MeshStandardMaterial color="#3e9b4f" flatShading />
 		</T.Mesh>
@@ -106,11 +108,17 @@
 
 <!-- Potting-shed placeholder (modeled properly in M3) -->
 <T.Group position={[-5, shedY, 2]} rotation.y={0.5}>
-	<T.Mesh position.y={0.75} castShadow={full}>
+	<T.Mesh position.y={0.75} castShadow={full} onclick={() => nav.walkTo('shed')} {...walkCursor}>
 		<T.BoxGeometry args={[2.2, 1.5, 1.8]} />
 		<T.MeshStandardMaterial color="#e8b04b" flatShading />
 	</T.Mesh>
-	<T.Mesh position.y={1.85} rotation.y={Math.PI / 4} castShadow={full}>
+	<T.Mesh
+		position.y={1.85}
+		rotation.y={Math.PI / 4}
+		castShadow={full}
+		onclick={() => nav.walkTo('shed')}
+		{...walkCursor}
+	>
 		<T.ConeGeometry args={[1.7, 0.9, 4]} />
 		<T.MeshStandardMaterial color="#c95b3f" flatShading />
 	</T.Mesh>
