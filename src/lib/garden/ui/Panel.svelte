@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { garden } from '../state.svelte';
+	import { OFFSPRING, OFFSPRING_MEAN } from '../galtonWatson';
 
 	const SKILLS = ['Julia', 'Rust', 'Python', 'TypeScript', 'SQL', 'R', 'HTML / CSS', 'Svelte'];
 
@@ -63,17 +64,39 @@
 			</div>
 		{:else if garden.panel === 'placard:sapling'}
 			<p class="latin">Galton–Watson branching process</p>
-			<h2>The Sapling</h2>
+			<h2>The Branching Tree</h2>
 			<p class="planted">planted 2026</p>
 			<p>
-				A young tree grown by chance: each branch begets a random number of offshoots, and the
-				whole crown is one realization of a branching process — the same mathematics Galton and
-				Watson used to ask whether family names die out.
+				Every branch of this tree is one individual, and each bears
+				{#each OFFSPRING as p, k (k)}{k === 0 ? '' : k === OFFSPRING.length - 1 ? ' or ' : ', '}{k}
+					<span class="prob">({Math.round(p * 100)}%)</span>{/each} offshoots, drawn at random. The
+				crown you're looking at is one realization of the process — the same mathematics Galton and
+				Watson used in 1874 to ask whether family names die out.
 			</p>
 			<p>
-				It's still growing. Come back soon and you'll be able to regrow it yourself — a new random
-				tree every time.
+				With a mean of {OFFSPRING_MEAN.toFixed(2)} offspring per branch the process is
+				supercritical: most lineages flourish, but extinction is always possible. Click the tree to
+				plant a new one.
 			</p>
+			{#if garden.gw}
+				<div class="stats">
+					<h3>Realization no. {garden.gw.realization}</h3>
+					<p class="stat-line">
+						<strong>{garden.gw.total}</strong> individuals across
+						<strong>{garden.gw.generations + 1}</strong> generations
+						{#if garden.gw.truncated}(pruned for the sake of your GPU){/if}
+					</p>
+					<p class="stat-line generations">
+						{garden.gw.populations.join(' → ')}
+					</p>
+					{#if garden.gw.extinct}
+						<p class="stat-line extinct">
+							This lineage went extinct — even a thriving family tree can die out. Click the tree
+							to plant another.
+						</p>
+					{/if}
+				</div>
+			{/if}
 		{/if}
 	</div>
 {/if}
@@ -146,6 +169,32 @@
 		text-transform: uppercase;
 		color: #b0a488;
 		margin: -0.6rem 0 1rem;
+	}
+
+	.prob {
+		color: #7a8a6e;
+		font-size: 0.82em;
+	}
+
+	.stats {
+		margin-top: 1.3rem;
+		border-top: 1px dashed #e5dcc3;
+		padding-top: 0.9rem;
+	}
+
+	.stat-line {
+		margin: 0 0 0.5em;
+	}
+
+	.generations {
+		font-variant-numeric: tabular-nums;
+		font-weight: 700;
+		color: #3c8a46;
+	}
+
+	.extinct {
+		color: #b5651d;
+		font-weight: 600;
 	}
 
 	.chips {

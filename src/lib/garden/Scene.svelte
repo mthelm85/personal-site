@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { T, useTask } from '@threlte/core';
+	import { T } from '@threlte/core';
 	import { interactivity } from '@threlte/extras';
 	import { garden } from './state.svelte';
 	import { terrainHeight, COLORS, SUN_DIR } from './terrain';
@@ -13,6 +13,7 @@
 	import Shed from './Shed.svelte';
 	import NoticeBoard from './NoticeBoard.svelte';
 	import Placard from './Placard.svelte';
+	import GWTree from './GWTree.svelte';
 
 	interactivity();
 
@@ -21,20 +22,6 @@
 	// Reduced tier pulls the fog in: shorter draw distance, fewer pixels doing work.
 	const fogNear = $derived(full ? 34 : 20);
 	const fogFar = $derived(full ? 85 : 52);
-
-	// Clicking a specimen walks to its waypoint.
-	const walkCursor = {
-		onpointerenter: () => (document.body.style.cursor = 'pointer'),
-		onpointerleave: () => (document.body.style.cursor = 'default')
-	};
-
-	// Gentle sway on the sapling proves the render loop is alive.
-	let sway = $state(0);
-	let t = 0;
-	useTask((delta) => {
-		t += delta;
-		sway = Math.sin(t * 1.2) * 0.06;
-	});
 
 	// Trees: a few accents inside the hedge, bigger ones outside for depth.
 	const trees = [
@@ -47,8 +34,6 @@
 		{ x: 26, z: -22, s: 3.0, c: '#2f7d3b' },
 		{ x: 32, z: 10, s: 2.4, c: '#35864a' }
 	].map((tr) => ({ ...tr, y: terrainHeight(tr.x, tr.z) }));
-
-	const sapY = terrainHeight(0, 0);
 </script>
 
 <T.Color attach="background" args={[COLORS.sky.horizon.getHex()]} />
@@ -79,19 +64,8 @@
 <Pond />
 <Hedge />
 
-<!-- Sapling: trunk + swaying crown (the Galton–Watson tree arrives in M4) -->
-<T.Group position={[0, sapY, 0]}>
-	<T.Mesh position.y={0.6} castShadow={full} onclick={() => nav.walkTo('sapling')} {...walkCursor}>
-		<T.CylinderGeometry args={[0.12, 0.18, 1.2, 7]} />
-		<T.MeshStandardMaterial color="#8a5a3b" flatShading />
-	</T.Mesh>
-	<T.Group position.y={1.2} rotation.z={sway}>
-		<T.Mesh position.y={0.9} castShadow={full} onclick={() => nav.walkTo('sapling')} {...walkCursor}>
-			<T.ConeGeometry args={[1.0, 1.8, 8]} />
-			<T.MeshStandardMaterial color="#3e9b4f" flatShading />
-		</T.Mesh>
-	</T.Group>
-</T.Group>
+<!-- The Galton–Watson tree: a live branching-process realization -->
+<GWTree />
 
 {#each trees as tree (tree)}
 	<T.Group position={[tree.x, tree.y, tree.z]} scale={tree.s}>

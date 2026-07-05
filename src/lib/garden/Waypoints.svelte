@@ -3,6 +3,7 @@
 	import { terrainHeight } from './terrain';
 	import { WAYPOINTS, neighborsOf } from './waypoints';
 	import { nav } from './nav.svelte';
+	import { garden } from './state.svelte';
 
 	let hovered = $state<string | null>(null);
 	let pulse = $state(0);
@@ -39,6 +40,8 @@
 
 	/** Tab / arrows cycle the current node's neighbors; Enter walks. */
 	function onKeydown(e: KeyboardEvent) {
+		// Keep Tab native while DOM overlays (landing, panels) are up.
+		if (!garden.entered || garden.panel !== null) return;
 		if (nav.traveling) return;
 		const ring = neighborsOf(nav.current);
 		if (ring.length === 0) return;

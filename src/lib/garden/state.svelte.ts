@@ -16,6 +16,16 @@ class GardenState {
 	/** Open DOM content panel, if any. */
 	panel = $state<PanelId | null>(null);
 
+	/** Stats of the branching tree's current realization (set by GWTree). */
+	gw = $state<{
+		total: number;
+		generations: number;
+		populations: number[];
+		extinct: boolean;
+		truncated: boolean;
+		realization: number;
+	} | null>(null);
+
 	get tier(): Tier | null {
 		return this.report?.tier ?? null;
 	}
