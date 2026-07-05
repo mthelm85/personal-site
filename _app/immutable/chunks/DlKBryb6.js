@@ -1,1 +1,0 @@
-const o=["ArrowUp","ArrowUp","ArrowDown","ArrowDown","ArrowLeft","ArrowRight","ArrowLeft","ArrowRight","b","a"];function w(t){let r=0;const e=n=>{n.key===o[r]?(r++,r===o.length&&(r=0,t())):r=n.key===o[0]?1:0};return window.addEventListener("keydown",e),()=>window.removeEventListener("keydown",e)}export{w as initKonami};
