@@ -153,6 +153,7 @@
 		.timeline-year {
 			flex-direction: row;
 			align-items: center;
+			justify-content: flex-start;
 			gap: 8px;
 		}
 		.timeline-year span {
@@ -160,6 +161,8 @@
 		}
 		.timeline-dot {
 			position: static;
+			order: -1;
+			flex-shrink: 0;
 		}
 	}
 </style>
