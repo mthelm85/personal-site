@@ -78,10 +78,10 @@
 	}
 
 	.about-prose p {
-		font-family: 'EB Garamond', Georgia, serif;
-		font-size: 1.05rem;
+		font-family: 'MattHelm', Georgia, serif;
+		font-size: 1.45rem;
 		line-height: 1.75;
-		color: #b0aec8;
+		color: var(--color-text-secondary);
 		margin: 0 0 1.4em;
 	}
 
@@ -105,11 +105,11 @@
 	}
 
 	.skill-item {
-		font-family: 'JetBrains Mono', monospace;
-		font-size: 11px;
-		color: #9a98b0;
-		padding: 3px 10px;
-		border: 1px solid #2a2848;
+		font-family: 'MattHelm', Georgia, serif;
+		font-size: 18px;
+		color: var(--color-text-secondary);
+		padding: 6px 16px;
+		border: 1px solid var(--color-border-light);
 		border-radius: 2px;
 		transition:
 			border-color 0.3s,
@@ -117,8 +117,8 @@
 	}
 
 	.skill-item:hover {
-		border-color: #4a4870;
-		color: #b0aec8;
+		border-color: var(--color-accent);
+		color: var(--color-text-primary);
 	}
 
 	@media (max-width: 600px) {
@@ -126,15 +126,15 @@
 			padding: 55px 20px;
 		}
 		.about-prose p {
-			font-size: 0.95rem;
+			font-size: 1.3rem;
 		}
 		.skills-grid {
 			margin-top: 34px;
 			gap: 21px;
 		}
 		.skill-item {
-			font-size: 10px;
-			padding: 2px 8px;
+			font-size: 16px;
+			padding: 5px 14px;
 		}
 	}
 </style>

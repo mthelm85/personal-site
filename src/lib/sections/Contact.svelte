@@ -48,9 +48,9 @@
 	}
 
 	.contact-intro {
-		font-family: 'EB Garamond', Georgia, serif;
-		font-size: 1.1rem;
-		color: #b0aec8;
+		font-family: 'MattHelm', Georgia, serif;
+		font-size: 1.5rem;
+		color: var(--color-text-secondary);
 		line-height: 1.75;
 		margin: 34px 0 55px;
 	}
@@ -75,23 +75,23 @@
 	}
 
 	.contact-link-label {
-		font-size: 10px;
-		color: #9a98b0;
+		font-size: 12px;
+		color: var(--color-text-secondary);
 	}
 
 	.contact-link-value {
-		font-family: 'EB Garamond', Georgia, serif;
-		font-size: 1.1rem;
-		color: #8886c0;
+		font-family: 'MattHelm', Georgia, serif;
+		font-size: 1.3rem;
+		color: var(--color-accent);
 		transition: color 0.2s;
 	}
 
 	.contact-link:hover .contact-link-value {
-		color: #8886c0;
+		color: var(--color-accent-hi);
 	}
 
 	.site-footer {
-		border-top: 1px solid #1a1a2e;
+		border-top: 1px solid var(--color-border);
 		padding-top: 21px;
 	}
 
@@ -112,7 +112,7 @@
 			margin-bottom: 34px;
 		}
 		.contact-link-value {
-			font-size: 0.95rem;
+			font-size: 1.1rem;
 			word-break: break-all;
 		}
 	}

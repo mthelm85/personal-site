@@ -56,7 +56,7 @@
 		top: 0;
 		bottom: 0;
 		width: 1px;
-		background: rgba(154, 152, 176, 0.35);
+		background: var(--color-border-light);
 	}
 
 	.timeline-entry {
@@ -78,9 +78,9 @@
 	}
 
 	.timeline-year span {
-		font-family: 'JetBrains Mono', monospace;
-		font-size: 11px;
-		color: #9a98b0;
+		font-family: 'MattHelm', Georgia, serif;
+		font-size: 18px;
+		color: var(--color-text-secondary);
 		letter-spacing: 0.04em;
 		padding-right: 14px; /* clear the dot */
 	}
@@ -96,13 +96,13 @@
 	}
 
 	.timeline-dot.work {
-		background: #1a1a2e;
-		border-color: #6a68a0;
+		background: var(--color-bg);
+		border-color: var(--color-accent);
 	}
 
 	.timeline-dot.education {
-		background: #1a1a2e;
-		border-color: #b08860;
+		background: var(--color-bg);
+		border-color: var(--color-accent-warm);
 	}
 
 	.timeline-meta {
@@ -111,29 +111,29 @@
 	}
 
 	.timeline-type {
-		font-size: 10px;
+		font-size: 16px;
 	}
 
 	.timeline-title {
-		font-family: 'EB Garamond', Georgia, serif;
-		font-size: 1.2rem;
+		font-family: 'MattHelm', Georgia, serif;
+		font-size: 1.35rem;
 		font-weight: 500;
-		color: #d4d0c8;
+		color: var(--color-text-primary);
 		margin: 4px 0 4px;
 	}
 
 	.timeline-org {
-		font-family: 'JetBrains Mono', monospace;
-		font-size: 11px;
-		color: #9a98b0;
+		font-family: 'MattHelm', Georgia, serif;
+		font-size: 18px;
+		color: var(--color-text-secondary);
 		margin-bottom: 10px;
 		letter-spacing: 0.03em;
 	}
 
 	.timeline-desc {
-		font-family: 'EB Garamond', Georgia, serif;
-		font-size: 0.95rem;
-		color: #9a98b0;
+		font-family: 'MattHelm', Georgia, serif;
+		font-size: 1.3rem;
+		color: var(--color-text-secondary);
 		line-height: 1.6;
 		margin: 0;
 	}

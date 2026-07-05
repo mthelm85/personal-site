@@ -1,14 +1,13 @@
 <script lang="ts">
-	import { activeSection } from '$lib/stores/scroll';
-	import { replOpen, currentEquation, replMode, sectionLabels } from '$lib/stores/repl';
+	import { replOpen, currentEquation, replMode } from '$lib/stores/repl';
 	import Katex from './Katex.svelte';
 
 	let label = $derived(() => {
-		// If user has submitted an equation via REPL, show that
-		if ($currentEquation && $replMode !== 'default') {
+		// If the user has submitted an equation via the REPL, show that
+		if ($currentEquation && $replMode === 'flowfield') {
 			return $currentEquation;
 		}
-		return $sectionLabels[$activeSection] ?? 'f(x, y)';
+		return 'f(x, y)';
 	});
 
 	function openRepl() {
@@ -26,6 +25,6 @@
 		<span class="cursor" aria-hidden="true"></span>
 	</button>
 	<div class="equation-tooltip">
-		Each expression is evaluated as an angle at every (x, y) point, creating a flow field. Particles follow the resulting vector field. Press Ctrl+K to try your own.
+		Each expression is evaluated as an angle at every (x, y) point, creating a flow field. The sea of numbers follows the resulting vector field. Press Ctrl+K to try your own.
 	</div>
 </div>

@@ -45,7 +45,7 @@
 			</div>
 
 			<div class="nav-links">
-				<div class="mono-label" style="margin-bottom: 13px; color: #9a98b0;">While you're here:</div>
+				<div class="mono-label" style="margin-bottom: 13px; color: var(--color-text-secondary);">While you're here:</div>
 				<div class="links">
 					<a href="/">Home</a>
 					<span aria-hidden="true">·</span>
@@ -73,85 +73,86 @@
 
 	.back-link {
 		display: inline-block;
-		color: #9a98b0;
+		color: var(--color-text-secondary);
 		text-decoration: none;
 		margin-bottom: 55px;
 		transition: color 0.2s;
-		font-size: 10px;
+		font-size: 12px;
 	}
 
 	.back-link:hover {
-		color: #9a98b0;
+		color: var(--color-text-secondary);
 	}
 
 	.error-code {
-		font-size: 11px;
-		color: #9a98b0;
+		font-size: 13px;
+		color: var(--color-text-secondary);
 		margin-bottom: 13px;
 		letter-spacing: 0.12em;
 	}
 
 	h1 {
-		font-family: 'EB Garamond', Georgia, serif;
+		font-family: 'MattHelm', Georgia, serif;
 		font-size: clamp(2rem, 5vw, 3.5rem);
 		font-weight: 500;
-		color: #d4d0c8;
+		color: var(--color-text-primary);
 		margin: 0 0 13px;
 	}
 
 	.theorem-statement {
-		font-family: 'EB Garamond', Georgia, serif;
-		font-size: 1.2rem;
-		color: #9a98b0;
+		font-family: 'MattHelm', Georgia, serif;
+		font-size: 1.55rem;
+		color: var(--color-text-secondary);
 		margin: 0 0 55px;
 		font-style: italic;
 	}
 
 	.proof-body {
-		font-family: 'EB Garamond', Georgia, serif;
-		font-size: 1.15rem;
+		font-family: 'MattHelm', Georgia, serif;
+		font-size: 1.45rem;
 		line-height: 1.8;
 	}
 
 	.proof-step {
-		color: #9a98b0;
+		color: var(--color-text-secondary);
 		margin-bottom: 13px;
 		padding-left: 8px;
+		font-size: 1.3rem;
 	}
 
 	.step-label {
-		color: #8886c0;
+		color: var(--color-accent-hi);
 		font-style: italic;
 	}
 
 	.proof-step em {
-		color: #d4d0c8;
+		color: var(--color-text-primary);
 		font-style: normal;
 		font-weight: 500;
 	}
 
 	.contradiction {
-		color: #8886c0;
+		color: var(--color-accent-hi);
 		font-size: 1.3rem;
 		margin: 21px 0 34px;
 		padding-left: 8px;
-		border-left: 2px solid #1a1a2e;
+		border-left: 2px solid var(--color-border);
 	}
 
 	.proof-resolution {
-		border-top: 1px solid #1a1a2e;
+		border-top: 1px solid var(--color-border);
 		padding-top: 21px;
 		margin: 34px 0 55px;
 	}
 
 	.proof-resolution p {
-		color: #9a98b0;
+		color: var(--color-text-secondary);
 		margin: 0 0 13px;
 	}
 
 	.corollary {
 		font-size: 0.95rem;
-		color: #9a98b0 !important;
+		color: var(--color-text-secondary) !important;
 	}
 
 	.nav-links {
@@ -162,18 +163,18 @@
 		display: flex;
 		gap: 13px;
 		align-items: center;
-		font-family: 'JetBrains Mono', monospace;
-		font-size: 11px;
-		color: #9a98b0;
+		font-family: 'MattHelm', Georgia, serif;
+		font-size: 13px;
+		color: var(--color-text-secondary);
 	}
 
 	.links a {
-		color: #9a98b0;
+		color: var(--color-text-secondary);
 		text-decoration: none;
 		transition: color 0.2s;
 	}
 
 	.links a:hover {
-		color: #8886c0;
+		color: var(--color-accent);
 	}
 </style>

@@ -5,28 +5,14 @@
 	import { browser } from '$app/environment';
 	import { replOpen } from '$lib/stores/repl';
 
-	import AttractorCanvas from '$lib/components/AttractorCanvas.svelte';
 	import Nav from '$lib/components/Nav.svelte';
-	import SectionDots from '$lib/components/SectionDots.svelte';
 	import EquationDisplay from '$lib/components/EquationDisplay.svelte';
 	import FunctionRepl from '$lib/components/FunctionRepl.svelte';
-
 
 	let { children } = $props();
 
 	onMount(() => {
 		if (!browser) return;
-
-		let cleanupKonami: (() => void) | undefined;
-
-		// Konami code → Mandelbrot
-		import('$lib/easter-eggs/konami').then(({ initKonami }) => {
-			cleanupKonami = initKonami(() => {
-				import('$lib/stores/repl').then(({ replMode }) => {
-					replMode.set('mandelbrot');
-				});
-			});
-		});
 
 		const handleKey = (e: KeyboardEvent) => {
 			if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
@@ -40,7 +26,6 @@
 		window.addEventListener('keydown', handleKey);
 
 		return () => {
-			cleanupKonami?.();
 			window.removeEventListener('keydown', handleKey);
 		};
 	});
@@ -51,12 +36,8 @@
 	<title>Matt Helm — Data Scientist</title>
 </svelte:head>
 
-<!-- Background attractor canvas -->
-<AttractorCanvas />
-
 <!-- Persistent UI layer -->
 <Nav />
-<SectionDots />
 <EquationDisplay />
 <FunctionRepl />
 

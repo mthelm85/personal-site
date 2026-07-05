@@ -41,15 +41,15 @@
 	</div>
 
 	{#if project.github || project.link}
-		<div class="flex gap-4" style="font-family: 'JetBrains Mono', monospace; font-size: 14px;">
+		<div class="flex gap-4" style="font-family: 'MattHelm', Georgia, serif; font-size: 20px;">
 			{#if project.github}
-				<a href={project.github} target="_blank" rel="noopener noreferrer" style="color: #8886c0;"
-					>GitHub ↗</a
+				<a href={project.github} target="_blank" rel="noopener noreferrer" style="color: var(--color-accent-hi);"
+					>GitHub →</a
 				>
 			{/if}
 			{#if project.link}
-				<a href={project.link} target="_blank" rel="noopener noreferrer" style="color: #8886c0;"
-					>View ↗</a
+				<a href={project.link} target="_blank" rel="noopener noreferrer" style="color: var(--color-accent-hi);"
+					>View →</a
 				>
 			{/if}
 		</div>

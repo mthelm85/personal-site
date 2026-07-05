@@ -31,9 +31,9 @@
 	}
 
 	.section-intro {
-		font-family: 'EB Garamond', Georgia, serif;
-		font-size: 1rem;
-		color: #9a98b0;
+		font-family: 'MattHelm', Georgia, serif;
+		font-size: 1.2rem;
+		color: var(--color-text-secondary);
 		margin: 21px 0 55px;
 		font-style: italic;
 	}

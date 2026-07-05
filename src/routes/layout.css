@@ -1,12 +1,23 @@
 @import 'tailwindcss';
 @import 'katex/dist/katex.min.css';
 
+/* ─── Custom Fonts ─────────────────────────────────────────── */
+@font-face {
+	font-family: 'MattHelm';
+	src: url('/MattHelm-Regular.ttf') format('truetype');
+	font-weight: normal;
+	font-style: normal;
+}
+
 /* ─── Design Tokens ─────────────────────────────────────────── */
-@theme {
-	/* Colors */
+:root {
+	/* Dark mode (default) */
+	color-scheme: dark;
 	--color-bg: #08080f;
+	--color-bg-rgb: 8, 8, 15;
 	--color-surface: #0e0e1a;
 	--color-border: #1a1a2e;
+	--color-border-light: #2a2848;
 
 	--color-text-primary: #d4d0c8;
 	--color-text-secondary: #9a98b0;
@@ -16,22 +27,26 @@
 	--color-accent-hi: #8886c0;
 	--color-accent-warm: #b08860;
 
-	--color-eq-ghost: #9a98b0;
-	--color-eq-hover: #9a98b0;
-	--color-eq-active: #b0aec8;
+}
 
-	/* Fonts */
-	--font-serif: 'EB Garamond', Georgia, serif;
-	--font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+/* Light mode */
+@media (prefers-color-scheme: light) {
+	:root {
+		color-scheme: light;
+		--color-bg: #fafaf8;
+		--color-bg-rgb: 250, 250, 248;
+		--color-surface: #f5f5f3;
+		--color-border: #e0e0da;
+		--color-border-light: #d5d5cf;
 
-	/* Spacing — Fibonacci: 8, 13, 21, 34, 55, 89, 144 */
-	--spacing-fib-1: 8px;
-	--spacing-fib-2: 13px;
-	--spacing-fib-3: 21px;
-	--spacing-fib-4: 34px;
-	--spacing-fib-5: 55px;
-	--spacing-fib-6: 89px;
-	--spacing-fib-7: 144px;
+		--color-text-primary: #1a1a1f;
+		--color-text-secondary: #5a5a6a;
+		--color-text-tertiary: #5a5a6a;
+
+		--color-accent: #7a78b0;
+		--color-accent-hi: #6a68a0;
+		--color-accent-warm: #a07850;
+	}
 }
 
 /* ─── Base Styles ─────────────────────────────────────────────── */
@@ -43,13 +58,13 @@
 
 html {
 	scroll-behavior: smooth;
-	font-size: 18px;
+	font-size: 20px;
 }
 
 body {
-	background-color: #08080f;
-	color: #d4d0c8;
-	font-family: 'EB Garamond', Georgia, serif;
+	background-color: var(--color-bg);
+	color: var(--color-text-primary);
+	font-family: 'MattHelm', Georgia, serif;
 	line-height: 1.7;
 	min-height: 100vh;
 	overflow-x: hidden;
@@ -62,10 +77,10 @@ body {
 	left: 8px;
 	z-index: 9999;
 	padding: 8px 16px;
-	background: #6a68a0;
-	color: #d4d0c8;
-	font-family: 'JetBrains Mono', monospace;
-	font-size: 12px;
+	background: var(--color-accent);
+	color: var(--color-text-primary);
+	font-family: 'MattHelm', Georgia, serif;
+	font-size: 14px;
 	text-decoration: none;
 	border-radius: 4px;
 	transition: top 0.2s;
@@ -74,46 +89,38 @@ body {
 	top: 8px;
 }
 
-/* ─── Typography Utilities ────────────────────────────────────── */
-.font-serif {
-	font-family: 'EB Garamond', Georgia, serif;
-}
-.font-mono {
-	font-family: 'JetBrains Mono', monospace;
-}
-
 /* Section headings */
 .section-heading {
-	font-family: 'EB Garamond', Georgia, serif;
+	font-family: 'MattHelm', Georgia, serif;
 	font-size: clamp(2rem, 4vw, 3rem);
 	font-weight: 500;
 	letter-spacing: -0.01em;
-	color: #d4d0c8;
+	color: var(--color-text-primary);
 	line-height: 1.2;
 }
 
 /* Mono label style */
 .mono-label {
-	font-family: 'JetBrains Mono', monospace;
-	font-size: 11px;
+	font-family: 'MattHelm', Georgia, serif;
+	font-size: 18px;
 	letter-spacing: 0.06em;
 	text-transform: uppercase;
-	color: #9a98b0;
+	color: var(--color-text-secondary);
 }
 
 /* ─── Navigation ───────────────────────────────────────────────── */
 nav a {
-	font-family: 'JetBrains Mono', monospace;
-	font-size: 12px;
+	font-family: 'MattHelm', Georgia, serif;
+	font-size: 18px;
 	letter-spacing: 0.06em;
 	text-transform: uppercase;
-	color: #9a98b0;
+	color: var(--color-text-secondary);
 	text-decoration: none;
 	transition: color 0.2s;
 }
 nav a:hover,
 nav a.active {
-	color: #c0bedd;
+	color: var(--color-text-primary);
 }
 
 /* ─── Equation Display (bottom-left) ──────────────────────────── */
@@ -131,9 +138,9 @@ nav a.active {
 }
 
 .equation-display {
-	font-family: 'JetBrains Mono', monospace;
-	font-size: 11px;
-	color: #9a98b0;
+	font-family: 'MattHelm', Georgia, serif;
+	font-size: 13px;
+	color: var(--color-text-secondary);
 	cursor: pointer;
 	transition: color 0.3s;
 	display: flex;
@@ -142,7 +149,7 @@ nav a.active {
 }
 
 .equation-display:hover {
-	color: #a8a6c8;
+	color: var(--color-accent-hi);
 }
 
 .equation-tooltip {
@@ -151,14 +158,14 @@ nav a.active {
 	left: 0;
 	max-width: 280px;
 	padding: 8px 12px;
-	background: rgba(10, 10, 18, 0.92);
-	border: 1px solid #3a3858;
+	background: var(--color-surface);
+	border: 1px solid var(--color-border);
 	border-radius: 4px;
 	backdrop-filter: blur(12px);
-	font-family: 'JetBrains Mono', monospace;
-	font-size: 9px;
+	font-family: 'MattHelm', Georgia, serif;
+	font-size: 13px;
 	line-height: 1.5;
-	color: #9a98b0;
+	color: var(--color-text-secondary);
 	opacity: 0;
 	pointer-events: none;
 	transform: translateY(4px);
@@ -174,7 +181,7 @@ nav a.active {
 	display: inline-block;
 	width: 1px;
 	height: 12px;
-	background: #6a68a0;
+	background: var(--color-accent);
 	animation: blink 1.2s step-end infinite;
 	opacity: 0.7;
 }
@@ -189,48 +196,6 @@ nav a.active {
 	}
 }
 
-/* ─── Section Dots ─────────────────────────────────────────────── */
-.section-dots {
-	position: fixed;
-	right: 21px;
-	top: 50%;
-	transform: translateY(-50%);
-	z-index: 50;
-	display: flex;
-	flex-direction: column;
-	gap: 13px;
-}
-
-@media (max-width: 600px) {
-	.section-dots {
-		display: none;
-	}
-}
-
-.section-dot {
-	width: 6px;
-	height: 6px;
-	border-radius: 50%;
-	background: #1a1a2e;
-	border: 1px solid #3a3850;
-	cursor: pointer;
-	transition:
-		background 0.3s,
-		border-color 0.3s,
-		transform 0.2s;
-}
-
-.section-dot:hover {
-	background: #4a4870;
-	transform: scale(1.3);
-}
-
-.section-dot.active {
-	background: #6a68a0;
-	border-color: #8886c0;
-	transform: scale(1.2);
-}
-
 /* ─── Function REPL ────────────────────────────────────────────── */
 .repl-overlay {
 	position: fixed;
@@ -239,7 +204,7 @@ nav a.active {
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	background: rgba(8, 8, 15, 0.7);
+	background: rgba(var(--color-bg-rgb), 0.7);
 	backdrop-filter: blur(4px);
 }
 
@@ -251,8 +216,8 @@ nav a.active {
 
 .repl-palette {
 	width: min(600px, 90vw);
-	background: #0e0e1a;
-	border: 1px solid #1a1a2e;
+	background: var(--color-surface);
+	border: 1px solid var(--color-border);
 	border-radius: 6px;
 	overflow: hidden;
 	box-shadow: 0 24px 80px rgba(0, 0, 0, 0.6);
@@ -260,22 +225,22 @@ nav a.active {
 
 .repl-header {
 	padding: 12px 16px 8px;
-	border-bottom: 1px solid #1a1a2e;
+	border-bottom: 1px solid var(--color-border);
 }
 
 .repl-header .label {
-	font-family: 'JetBrains Mono', monospace;
-	font-size: 10px;
+	font-family: 'MattHelm', Georgia, serif;
+	font-size: 14px;
 	letter-spacing: 0.06em;
 	text-transform: uppercase;
-	color: #9a98b0;
+	color: var(--color-text-secondary);
 	display: block;
 }
 
 .repl-header .label-sub {
-	font-family: 'EB Garamond', Georgia, serif;
-	font-size: 12px;
-	color: #9a98b0;
+	font-family: 'MattHelm', Georgia, serif;
+	font-size: 14px;
+	color: var(--color-text-secondary);
 	font-style: italic;
 	display: block;
 	margin-top: 4px;
@@ -291,26 +256,26 @@ nav a.active {
 	outline: none;
 	font-family: 'JetBrains Mono', monospace;
 	font-size: 16px;
-	color: #8886c0;
-	caret-color: #8886c0;
+	color: var(--color-accent-hi);
+	caret-color: var(--color-accent-hi);
 }
 
 .repl-input::placeholder {
-	color: #9a98b0;
+	color: var(--color-text-secondary);
 }
 
 .repl-hint {
 	padding: 8px 16px 12px;
-	font-family: 'JetBrains Mono', monospace;
-	font-size: 10px;
-	color: #9a98b0;
-	border-top: 1px solid #12121e;
+	font-family: 'MattHelm', Georgia, serif;
+	font-size: 12px;
+	color: var(--color-text-secondary);
+	border-top: 1px solid var(--color-border-light);
 }
 
 /* ─── Project Cards ────────────────────────────────────────────── */
 .project-card {
-	background: #0e0e1a;
-	border: 1px solid #1a1a2e;
+	background: var(--color-surface);
+	border: 1px solid var(--color-border);
 	border-radius: 4px;
 	padding: 21px;
 	transition:
@@ -321,32 +286,32 @@ nav a.active {
 }
 
 .project-card:hover {
-	border-color: #2a2848;
+	border-color: var(--color-border-light);
 }
 
 .project-card h3 {
-	font-family: 'EB Garamond', Georgia, serif;
-	font-size: 1.2rem;
-	color: #d4d0c8;
+	font-family: 'MattHelm', Georgia, serif;
+	font-size: 1.35rem;
+	color: var(--color-text-primary);
 	margin: 0 0 8px;
 }
 
 .project-card p {
-	font-size: 0.95rem;
-	color: #9a98b0;
+	font-size: 1.3rem;
+	color: var(--color-text-secondary);
 	margin: 0 0 13px;
 	line-height: 1.5;
 }
 
 .tech-tag {
 	display: inline-block;
-	padding: 2px 8px;
-	background: #12121e;
-	border: 1px solid #1a1a2e;
+	padding: 6px 16px;
+	background: var(--color-surface);
+	border: 1px solid var(--color-accent);
 	border-radius: 2px;
-	font-family: 'JetBrains Mono', monospace;
-	font-size: 10px;
-	color: #9a98b0;
+	font-family: 'MattHelm', Georgia, serif;
+	font-size: 18px;
+	color: var(--color-text-secondary);
 	margin: 0 4px 4px 0;
 }
 
@@ -362,7 +327,7 @@ nav a.active {
 	top: 0;
 	bottom: 0;
 	width: 1px;
-	background: #1a1a2e;
+	background: var(--color-border);
 	transform: translateX(-50%);
 }
 
@@ -381,19 +346,20 @@ nav a.active {
 
 /* ─── Global Link Styles ───────────────────────────────────────── */
 a {
-	color: #8886c0;
+	color: var(--color-accent-hi);
 	text-decoration: none;
 	transition: color 0.2s;
 }
 
 a:hover {
-	color: #8886c0;
+	color: var(--color-accent);
 }
 
 /* ─── Selection ────────────────────────────────────────────────── */
 ::selection {
-	background: #6a68a040;
-	color: #d4d0c8;
+	background: var(--color-accent);
+	opacity: 0.25;
+	color: var(--color-text-primary);
 }
 
 /* ─── Scrollbar ────────────────────────────────────────────────── */
@@ -401,10 +367,10 @@ a:hover {
 	width: 4px;
 }
 ::-webkit-scrollbar-track {
-	background: #08080f;
+	background: var(--color-bg);
 }
 ::-webkit-scrollbar-thumb {
-	background: #1a1a2e;
+	background: var(--color-border);
 	border-radius: 2px;
 }
 
@@ -425,7 +391,7 @@ a:hover {
 /* ─── Mobile Optimizations ─────────────────────────────────────── */
 @media (max-width: 600px) {
 	html {
-		font-size: 16px;
+		font-size: 18px;
 	}
 
 	.project-card {
@@ -433,8 +399,8 @@ a:hover {
 	}
 
 	.tech-tag {
-		font-size: 9px;
-		padding: 2px 6px;
+		font-size: 16px;
+		padding: 5px 14px;
 	}
 }
 
@@ -448,4 +414,11 @@ a:hover {
 		animation: none !important;
 		opacity: 0.7 !important;
 	}
+}
+
+@font-face {
+    font-family: 'MattHelm';
+    src: url('/MattHelm-Regular.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
 }
