@@ -24,7 +24,4 @@
 		<span class="eq-label"><Katex math={label()} /></span>
 		<span class="cursor" aria-hidden="true"></span>
 	</button>
-	<div class="equation-tooltip">
-		Each expression is evaluated as an angle at every (x, y) point, creating a flow field. The sea of numbers follows the resulting vector field. Press Ctrl+K to try your own.
-	</div>
 </div>

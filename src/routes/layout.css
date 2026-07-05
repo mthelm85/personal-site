@@ -152,31 +152,6 @@ nav a.active {
 	color: var(--color-accent-hi);
 }
 
-.equation-tooltip {
-	position: absolute;
-	bottom: calc(100% + 8px);
-	left: 0;
-	max-width: 280px;
-	padding: 8px 12px;
-	background: var(--color-surface);
-	border: 1px solid var(--color-border);
-	border-radius: 4px;
-	backdrop-filter: blur(12px);
-	font-family: 'MattHelm', Georgia, serif;
-	font-size: 13px;
-	line-height: 1.5;
-	color: var(--color-text-secondary);
-	opacity: 0;
-	pointer-events: none;
-	transform: translateY(4px);
-	transition: opacity 0.3s, transform 0.3s;
-}
-
-.equation-wrapper:hover .equation-tooltip {
-	opacity: 1;
-	transform: translateY(0);
-}
-
 .equation-display .cursor {
 	display: inline-block;
 	width: 1px;
@@ -230,7 +205,7 @@ nav a.active {
 
 .repl-header .label {
 	font-family: 'MattHelm', Georgia, serif;
-	font-size: 14px;
+	font-size: 20px;
 	letter-spacing: 0.06em;
 	text-transform: uppercase;
 	color: var(--color-text-secondary);
@@ -239,7 +214,7 @@ nav a.active {
 
 .repl-header .label-sub {
 	font-family: 'MattHelm', Georgia, serif;
-	font-size: 14px;
+	font-size: 18px;
 	color: var(--color-text-secondary);
 	font-style: italic;
 	display: block;
@@ -255,7 +230,7 @@ nav a.active {
 	border: none;
 	outline: none;
 	font-family: 'JetBrains Mono', monospace;
-	font-size: 16px;
+	font-size: 24px;
 	color: var(--color-accent-hi);
 	caret-color: var(--color-accent-hi);
 }
@@ -267,7 +242,7 @@ nav a.active {
 .repl-hint {
 	padding: 8px 16px 12px;
 	font-family: 'MattHelm', Georgia, serif;
-	font-size: 12px;
+	font-size: 17px;
 	color: var(--color-text-secondary);
 	border-top: 1px solid var(--color-border-light);
 }
