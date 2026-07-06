@@ -18,31 +18,26 @@
 
 	let canvas: HTMLCanvasElement;
 
-	// Shown only if the invisible calibration takes longer than a moment (set from
-	// inside onMount). Fast machines finish before this ever flips true.
-	let calibrating = $state(false);
-
+	// Base digit sizes at a reference viewport; the actual sizes are these scaled
+	// by a screen-size factor (see sizeFactor) so "Matt Helm" stays legible on
+	// small screens and reads comfortably on large ones.
 	const SIZES = [6, 8, 10];
 	const GLOWS = 6;
 
-	// Quality levels, best → worst, chosen ONCE by an invisible startup
-	// calibration (see calibrate()). The performance cost is dominated by the
-	// number of draw calls (particles), so the lever is particle COUNT — but as
-	// count drops the field would look sparse, so digits also grow to keep screen
-	// coverage roughly constant ("fewer + bigger"). Bigger sprites stay perfectly
-	// crisp because they are baked at native resolution; we never touch the canvas
-	// resolution (that would blur) nor change anything after the reveal (no pulse).
-	//   countMul    fraction of the base particle count
-	//   sizeMul     digit-size multiplier (keeps coverage as count falls)
-	//   renderEvery render 1-in-N frames (2 ≈ 30fps) — halves the trail-fill cost
-	// coverage ≈ countMul · sizeMul² stays ~0.75–1.0 across the range.
-	const LEVELS = [
-		{ countMul: 1.0, sizeMul: 1.0, renderEvery: 1 },
-		{ countMul: 0.62, sizeMul: 1.22, renderEvery: 1 },
-		{ countMul: 0.4, sizeMul: 1.45, renderEvery: 1 },
-		{ countMul: 0.26, sizeMul: 1.7, renderEvery: 1 },
-		{ countMul: 0.26, sizeMul: 1.7, renderEvery: 2 }
-	];
+	// Performance strategy — three decoupled levers, no resolution change (so
+	// digits are always crisp) and no loader:
+	//   • SIZE is set purely from the screen size, once (legibility).
+	//   • COUNT is eased DOWN, one-way, only when the machine shows sustained jank
+	//     (median-gated, after a grace period so startup churn doesn't count).
+	//     Culled digits fade out — never a hard pop — so there is no flicker.
+	//   • DWELL time grows as the field thins, so the fewer remaining digits linger
+	//     longer on the "Matt Helm" mask and keep the name dense even when the
+	//     ambient background gets sparse.
+	// Net: capable machines stay full; weak ones smoothly self-optimise over the
+	// first few seconds, keeping the name legible throughout.
+	const Q_MIN = 0.16; // never drop below 16% of the base particle count
+	const Q_STEP = 0.12; // fraction shed per reduction step
+	const DWELL_MAX = 2.75; // cap on the dwell-time multiplier
 
 	// Bridge from the REPL stores into the simulation closure (assigned in onMount)
 	let applyUserFn: (fn: FieldFn | null) => void = () => {};
@@ -68,11 +63,13 @@
 		const ctx = canvas.getContext('2d')!;
 		const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-		// Calibration picks a quality LEVEL once, while hidden. Canvas resolution is
-		// fixed for the whole session (never resized) so digits are always crisp;
-		// `sizeMul` scales the baked digit size for the "fewer + bigger" trade.
-		let level = 0;
-		let sizeMul = 1;
+		// Canvas resolution is fixed for the whole session (never resized) so digits
+		// are always crisp. `q` is the current particle-count quality (1 = full),
+		// eased down only when needed. `sizeFactor` scales digit size to the screen
+		// and `dwellScale` grows as `q` falls to keep the name dense.
+		let q = 1;
+		let sizeFactor = 1;
+		let dwellScale = 1;
 		const dpr = Math.min(window.devicePixelRatio || 1, 2);
 
 		// Theme: canvas background tracks the site's --color-bg token; digit
@@ -109,7 +106,7 @@
 				for (let si = 0; si < SIZES.length; si++) {
 					sprites[d][si] = [];
 					for (let g = 0; g < GLOWS; g++) {
-						const fs = SIZES[si] * sizeMul;
+						const fs = SIZES[si] * sizeFactor;
 						const pad = 2;
 						const c = document.createElement('canvas');
 						c.width = (fs + pad * 2) * dpr;
@@ -140,12 +137,15 @@
 			dwell: number;
 			wasInside: boolean;
 			nextFlip: number;
+			fade: number; // 1 = fully visible; ramps to 0 when culled on a reduction
+			retiring: boolean; // marked for removal once its fade reaches 0
 		}
 
 		let W = 0;
 		let H = 0;
 		let mask = new Uint8Array(0);
 		let particles: Particle[] = [];
+		let retiringCount = 0; // how many particles are currently fading out
 		let progress = 0;
 		let depth = 0;
 		let t = 0;
@@ -214,7 +214,9 @@
 				glow: 0,
 				dwell: 0,
 				wasInside: false,
-				nextFlip: Math.random() * 200
+				nextFlip: Math.random() * 200,
+				fade: 1,
+				retiring: false
 			};
 		}
 
@@ -228,7 +230,9 @@
 			const inside =
 				dwellOn && xi >= 0 && xi < W && yi >= 0 && yi < H ? mask[yi * W + xi] : 0;
 
-			if (inside && !p.wasInside) p.dwell = 360 + Math.random() * 480;
+			// Dwell grows as the field thins (dwellScale ≥ 1), so fewer digits still
+			// keep the "Matt Helm" mask densely populated.
+			if (inside && !p.wasInside) p.dwell = (360 + Math.random() * 480) * dwellScale;
 			if (!inside) p.dwell = 0;
 			p.wasInside = !!inside;
 			const stuck = inside && p.dwell > 0;
@@ -297,6 +301,8 @@
 				p.d = (Math.random() * 10) | 0;
 				p.nextFlip = 60 + Math.random() * 240;
 			}
+
+			if (p.retiring) p.fade -= 0.03 * dt; // gentle ~0.55s dissolve on a reduction
 		}
 
 		function draw(p: Particle) {
@@ -304,25 +310,41 @@
 			if (g > GLOWS - 1) g = GLOWS - 1;
 			if (g < 0) g = 0;
 			const sp = sprites[p.d][p.si][g];
-			ctx.drawImage(sp.c, p.x - sp.w / 2, p.y - sp.w / 2, sp.w, sp.w);
+			if (p.fade < 1) {
+				ctx.globalAlpha = p.fade > 0 ? p.fade : 0;
+				ctx.drawImage(sp.c, p.x - sp.w / 2, p.y - sp.w / 2, sp.w, sp.w);
+				ctx.globalAlpha = 1;
+			} else {
+				ctx.drawImage(sp.c, p.x - sp.w / 2, p.y - sp.w / 2, sp.w, sp.w);
+			}
 		}
 
 		function particleTarget(): number {
 			const base = Math.min(8000, Math.floor((W * H) / 200));
-			return Math.floor(base * LEVELS[level].countMul);
+			return Math.floor(base * q);
 		}
 
-		// Switch to a quality level. Only ever called while the canvas is hidden
-		// (during calibration) or on resize, so it can rebuild hard — no fades
-		// needed. Rebakes the digit sprites at the level's size and reconciles the
-		// particle count.
-		function applyLevel(lv: number) {
-			level = lv;
-			sizeMul = LEVELS[lv].sizeMul;
-			bakeSprites();
+		// One-way quality reduction: lower q, grow the dwell multiplier to keep the
+		// name dense, and fade out the now-excess particles (draw() ramps their
+		// alpha; frame() removes them once invisible). Never a hard pop, never a
+		// resolution or sprite change — so no flicker.
+		function reduceQuality() {
+			q = Math.max(Q_MIN, q - Q_STEP);
+			dwellScale = Math.min(DWELL_MAX, 1 / q);
 			const target = particleTarget();
-			if (particles.length > target) particles.length = target;
-			else while (particles.length < target) particles.push(makeParticle());
+			for (let i = target; i < particles.length; i++) {
+				if (!particles[i].retiring) {
+					particles[i].retiring = true;
+					retiringCount++;
+				}
+			}
+		}
+
+		// Digit size tracks the smaller screen dimension so "Matt Helm" stays
+		// legible on phones and reads comfortably on large displays.
+		function computeSizeFactor() {
+			const vmin = Math.min(W, H);
+			sizeFactor = Math.min(1.15, Math.max(0.6, vmin / 950));
 		}
 
 		function resize() {
@@ -331,10 +353,12 @@
 			canvas.width = W * dpr;
 			canvas.height = H * dpr;
 			ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+			computeSizeFactor();
+			bakeSprites(); // re-bake digits at the screen-appropriate size
 			buildMask();
-			// Particle density follows the active quality level (see LEVELS).
 			const target = particleTarget();
 			particles = [];
+			retiringCount = 0;
 			for (let i = 0; i < target; i++) particles.push(makeParticle());
 			ctx.fillStyle = COLORS.bg;
 			ctx.fillRect(0, 0, W, H);
@@ -372,23 +396,24 @@
 		let resizePending = false;
 		let last = performance.now();
 
-		// Invisible calibration. While the canvas is still hidden (opacity 0) we run
-		// the real animation and measure the true frame interval of each LEVEL,
-		// stepping down until one holds ~60fps (or we hit the floor). Only then do we
-		// fade the field in — so the adjustment is never seen. Measuring the real
-		// config with a median makes it accurate and robust to one-off spikes.
-		const SETTLE_MS = 250; // ignore this much startup churn before measuring
-		const MEAS_FRAMES = 16; // samples per level for the median
-		const MEAS_SKIP = 3; // discard frames right after a level change
-		const ACCEPT = 1.1; // accept a level if median ≤ budget × this (~55fps+)
-		const REVEAL_MS = 900; // fade the field in once calibrated
-		const LOADER_MS = 1000; // show the "calibrating…" hint if not done by now
+		// One-way, median-gated quality reducer. We measure the real inter-frame
+		// interval and, only after a grace period (so page-load churn doesn't
+		// count), shed digits whenever a robust MEDIAN of recent frames is over
+		// budget. It only ever reduces — never restores — so it converges within a
+		// few seconds and never pulses. A short cooldown after each step lets the
+		// fade finish and the median re-measure the lighter config before deciding
+		// again, which prevents overshoot. renderEvery drops to 2 (≈30fps) only as a
+		// last resort once particle count is already at the floor.
+		const GRACE_MS = 1500; // ignore this much startup churn before reducing
+		const STEP_COOLDOWN = 700; // settle time after a reduction before the next
+		const JANK = 1.2; // median over budget × this ⇒ shed (≈ below 50fps)
+		const FADE_MS = 700; // brief intro fade-in (does NOT hide the adaptation)
 
-		let calibrated = reduced; // reduced-motion skips calibration entirely
-		let calStart = 0;
-		let calSamples: number[] = [];
-		let levelFrames = 0;
-		let revealStart = 0;
+		let renderEvery = 1;
+		let started = 0;
+		let lastStepAt = -1e9;
+		let medBuf: number[] = [];
+		let introStart = 0;
 		let introFade = reduced ? 1 : 0;
 		let scrollFade = 1;
 
@@ -401,31 +426,23 @@
 			return s[s.length >> 1];
 		}
 
-		function calibrate(now: number, rawMs: number) {
-			if (!calStart) calStart = now;
-			const elapsed = now - calStart;
-			if (!calibrating && elapsed > LOADER_MS) calibrating = true;
+		function monitor(now: number, rawMs: number) {
+			if (document.hidden || rawMs >= 1000) return; // ignore tab-switch / huge gaps
+			medBuf.push(rawMs);
+			if (medBuf.length > 24) medBuf.shift();
 
-			// Skip startup churn, hidden tabs, and huge gaps — none reflect the real
-			// steady-state cost we're trying to measure.
-			if (elapsed < SETTLE_MS || document.hidden || rawMs >= 1000) return;
+			if (now - started < GRACE_MS) return; // let startup churn pass
+			if (now - lastStepAt < STEP_COOLDOWN) return; // let the last step settle
+			if (medBuf.length < 16) return;
 
-			levelFrames++;
-			if (levelFrames <= MEAS_SKIP) return; // let the new level stabilise first
-			calSamples.push(rawMs);
-			if (calSamples.length < MEAS_FRAMES) return;
+			const budget = renderEvery * 16.67;
+			if (median(medBuf) <= budget * JANK) return; // smooth enough — stop reducing
 
-			const med = median(calSamples);
-			const budget = LEVELS[level].renderEvery * 16.67;
-			if (med <= budget * ACCEPT || level >= LEVELS.length - 1) {
-				calibrated = true;
-				calibrating = false;
-				revealStart = now;
-			} else {
-				applyLevel(level + 1); // step down and measure the next real config
-				calSamples = [];
-				levelFrames = 0;
-			}
+			if (q > Q_MIN) reduceQuality();
+			else if (renderEvery === 1) renderEvery = 2; // last resort: halve the framerate
+			else return; // already at the floor
+			lastStepAt = now;
+			medBuf = []; // re-measure the new, lighter config from scratch
 		}
 
 		function frame(now: number) {
@@ -438,7 +455,7 @@
 
 			// Cap the render rate: ~60fps at renderEvery 1, ~30fps at renderEvery 2.
 			// Bounds workload and keeps the trail look identical on high-refresh panels.
-			if (now - last < LEVELS[level].renderEvery * 16.67 - 3) return;
+			if (now - last < renderEvery * 16.67 - 3) return;
 
 			const rawMs = now - last;
 			let dt = rawMs / 16.67;
@@ -455,16 +472,21 @@
 				update(p, dt);
 				draw(p);
 			}
+			if (retiringCount > 0) {
+				const before = particles.length;
+				particles = particles.filter((p) => !(p.retiring && p.fade <= 0));
+				retiringCount -= before - particles.length;
+			}
 
-			if (!calibrated) {
-				calibrate(now, rawMs);
-			} else if (introFade < 1) {
-				// Reveal: fade the settled field in. This is the only opacity change
-				// the user ever sees; the calibration itself happened while hidden.
-				if (!revealStart) revealStart = now;
-				introFade = Math.min(1, (now - revealStart) / REVEAL_MS);
+			// Brief intro fade-in for polish (the adaptation that follows is visible).
+			if (!introStart) introStart = now;
+			if (introFade < 1) {
+				introFade = Math.min(1, (now - introStart) / FADE_MS);
 				applyOpacity();
 			}
+
+			if (!started) started = now;
+			monitor(now, rawMs);
 		}
 
 		let resizeTimer: ReturnType<typeof setTimeout>;
@@ -520,13 +542,6 @@
 
 <canvas bind:this={canvas} aria-hidden="true"></canvas>
 
-{#if calibrating}
-	<div class="cal" role="status" aria-live="polite">
-		<span class="cal-spinner" aria-hidden="true"></span>
-		<span>calibrating…</span>
-	</div>
-{/if}
-
 <style>
 	canvas {
 		position: fixed;
@@ -535,53 +550,5 @@
 		height: 100vh;
 		z-index: -1;
 		pointer-events: none;
-	}
-
-	.cal {
-		position: fixed;
-		inset: 0;
-		z-index: 2;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		gap: 12px;
-		font-family: 'MattHelm', Georgia, serif;
-		font-size: 15px;
-		letter-spacing: 0.14em;
-		color: var(--color-text-secondary);
-		pointer-events: none;
-		animation: cal-in 0.4s ease both;
-	}
-
-	.cal-spinner {
-		width: 14px;
-		height: 14px;
-		border: 2px solid transparent;
-		border-top-color: currentColor;
-		border-right-color: currentColor;
-		border-radius: 50%;
-		opacity: 0.85;
-		animation: cal-spin 0.8s linear infinite;
-	}
-
-	@keyframes cal-spin {
-		to {
-			transform: rotate(360deg);
-		}
-	}
-
-	@keyframes cal-in {
-		from {
-			opacity: 0;
-		}
-		to {
-			opacity: 1;
-		}
-	}
-
-	@media (prefers-reduced-motion: reduce) {
-		.cal-spinner {
-			animation: none;
-		}
 	}
 </style>
