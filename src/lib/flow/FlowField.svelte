@@ -221,6 +221,14 @@
 		}
 
 		function update(p: Particle, dt: number) {
+			// A culled digit freezes and dissolves in place. If it kept moving while
+			// fading it would smear a fading streak across the field ("weird lines");
+			// freezing removes the streak so it just melts away where it sits.
+			if (p.retiring) {
+				p.fade -= 0.04 * dt; // ~0.4s dissolve
+				return;
+			}
+
 			const swirlF = Math.max(0, 1 - progress * 1.35);
 			const biasV = 1.35 + 2.6 * progress;
 			const dwellOn = progress < 0.12;
@@ -301,8 +309,6 @@
 				p.d = (Math.random() * 10) | 0;
 				p.nextFlip = 60 + Math.random() * 240;
 			}
-
-			if (p.retiring) p.fade -= 0.03 * dt; // gentle ~0.55s dissolve on a reduction
 		}
 
 		function draw(p: Particle) {
@@ -320,7 +326,7 @@
 		}
 
 		function particleTarget(): number {
-			const base = Math.min(8000, Math.floor((W * H) / 200));
+			const base = Math.min(5000, Math.floor((W * H) / 200));
 			return Math.floor(base * q);
 		}
 
