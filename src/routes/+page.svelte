@@ -17,7 +17,12 @@
 	onMount(() => {
 		if (!browser) return;
 
-		// IntersectionObserver to track active section
+		// IntersectionObserver to track active section. We trigger on a thin band
+		// across the middle of the viewport (threshold 0) rather than a visible
+		// fraction of the section: a fraction threshold silently fails for sections
+		// taller than the viewport (e.g. "Fun Stuff"), where that fraction can never
+		// be on screen at once. Every section crosses the middle band regardless of
+		// its height, so each one reliably becomes active.
 		const observer = new IntersectionObserver(
 			(entries) => {
 				for (const entry of entries) {
@@ -27,8 +32,8 @@
 				}
 			},
 			{
-				threshold: 0.35,
-				rootMargin: '-10% 0px -10% 0px'
+				threshold: 0,
+				rootMargin: '-45% 0px -45% 0px'
 			}
 		);
 
