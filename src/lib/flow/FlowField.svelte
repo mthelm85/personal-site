@@ -18,26 +18,30 @@
 
 	let canvas: HTMLCanvasElement;
 
+	// Shown only if the invisible calibration takes longer than a moment (set from
+	// inside onMount). Fast machines finish before this ever flips true.
+	let calibrating = $state(false);
+
 	const SIZES = [6, 8, 10];
 	const GLOWS = 6;
 
-	// Quality tiers, best → worst. Tier 0 reproduces the original full-quality
-	// look. The adaptive monitor only ever steps DOWN through these (a one-way
-	// ratchet, never back up), and only after a startup grace period, so a
-	// capable machine is never touched. The levers are deliberately limited to
-	// particle count and framerate — NOT render resolution — because changing the
-	// canvas resolution at runtime clears the buffer (a visible flicker) and
-	// upscales (blur). Resolution is fixed for the session instead.
-	//   ppp         pixels-per-particle (lower = denser); the primary lever
-	//   cap         hard particle ceiling
-	//   renderEvery render 1-in-N frames (2 ≈ 30fps) — last-resort lever
-	// The drop in particle draws is what actually relieves a fill-bound GPU here
-	// (confirmed by testing), so we don't need the resolution lever.
-	const TIERS = [
-		{ ppp: 200, cap: 8000, renderEvery: 1 },
-		{ ppp: 320, cap: 4500, renderEvery: 1 },
-		{ ppp: 480, cap: 2500, renderEvery: 1 },
-		{ ppp: 750, cap: 1200, renderEvery: 2 }
+	// Quality levels, best → worst, chosen ONCE by an invisible startup
+	// calibration (see calibrate()). The performance cost is dominated by the
+	// number of draw calls (particles), so the lever is particle COUNT — but as
+	// count drops the field would look sparse, so digits also grow to keep screen
+	// coverage roughly constant ("fewer + bigger"). Bigger sprites stay perfectly
+	// crisp because they are baked at native resolution; we never touch the canvas
+	// resolution (that would blur) nor change anything after the reveal (no pulse).
+	//   countMul    fraction of the base particle count
+	//   sizeMul     digit-size multiplier (keeps coverage as count falls)
+	//   renderEvery render 1-in-N frames (2 ≈ 30fps) — halves the trail-fill cost
+	// coverage ≈ countMul · sizeMul² stays ~0.75–1.0 across the range.
+	const LEVELS = [
+		{ countMul: 1.0, sizeMul: 1.0, renderEvery: 1 },
+		{ countMul: 0.62, sizeMul: 1.22, renderEvery: 1 },
+		{ countMul: 0.4, sizeMul: 1.45, renderEvery: 1 },
+		{ countMul: 0.26, sizeMul: 1.7, renderEvery: 1 },
+		{ countMul: 0.26, sizeMul: 1.7, renderEvery: 2 }
 	];
 
 	// Bridge from the REPL stores into the simulation closure (assigned in onMount)
@@ -64,11 +68,11 @@
 		const ctx = canvas.getContext('2d')!;
 		const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-		// Everyone starts at full quality. The one-way monitor only trims quality
-		// after a grace period (see frame()) if the machine shows sustained jank in
-		// steady state. Canvas resolution is fixed for the whole session — never
-		// resized at runtime — so there is no flicker or blur from adaptation.
-		let tier = 0;
+		// Calibration picks a quality LEVEL once, while hidden. Canvas resolution is
+		// fixed for the whole session (never resized) so digits are always crisp;
+		// `sizeMul` scales the baked digit size for the "fewer + bigger" trade.
+		let level = 0;
+		let sizeMul = 1;
 		const dpr = Math.min(window.devicePixelRatio || 1, 2);
 
 		// Theme: canvas background tracks the site's --color-bg token; digit
@@ -105,7 +109,7 @@
 				for (let si = 0; si < SIZES.length; si++) {
 					sprites[d][si] = [];
 					for (let g = 0; g < GLOWS; g++) {
-						const fs = SIZES[si];
+						const fs = SIZES[si] * sizeMul;
 						const pad = 2;
 						const c = document.createElement('canvas');
 						c.width = (fs + pad * 2) * dpr;
@@ -136,15 +140,12 @@
 			dwell: number;
 			wasInside: boolean;
 			nextFlip: number;
-			fade: number; // 1 = fully visible; ramps to 0 when culled on a tier step
-			retiring: boolean; // marked for removal once its fade reaches 0
 		}
 
 		let W = 0;
 		let H = 0;
 		let mask = new Uint8Array(0);
 		let particles: Particle[] = [];
-		let retiringCount = 0; // how many particles are currently fading out
 		let progress = 0;
 		let depth = 0;
 		let t = 0;
@@ -213,9 +214,7 @@
 				glow: 0,
 				dwell: 0,
 				wasInside: false,
-				nextFlip: Math.random() * 200,
-				fade: 1,
-				retiring: false
+				nextFlip: Math.random() * 200
 			};
 		}
 
@@ -298,8 +297,6 @@
 				p.d = (Math.random() * 10) | 0;
 				p.nextFlip = 60 + Math.random() * 240;
 			}
-
-			if (p.retiring) p.fade -= 0.03 * dt; // gentle ~0.55s dissolve
 		}
 
 		function draw(p: Particle) {
@@ -307,35 +304,25 @@
 			if (g > GLOWS - 1) g = GLOWS - 1;
 			if (g < 0) g = 0;
 			const sp = sprites[p.d][p.si][g];
-			if (p.fade < 1) {
-				ctx.globalAlpha = p.fade > 0 ? p.fade : 0;
-				ctx.drawImage(sp.c, p.x - sp.w / 2, p.y - sp.w / 2, sp.w, sp.w);
-				ctx.globalAlpha = 1;
-			} else {
-				ctx.drawImage(sp.c, p.x - sp.w / 2, p.y - sp.w / 2, sp.w, sp.w);
-			}
+			ctx.drawImage(sp.c, p.x - sp.w / 2, p.y - sp.w / 2, sp.w, sp.w);
 		}
 
 		function particleTarget(): number {
-			const T = TIERS[tier];
-			return Math.min(T.cap, Math.floor((W * H) / T.ppp));
+			const base = Math.min(8000, Math.floor((W * H) / 200));
+			return Math.floor(base * LEVELS[level].countMul);
 		}
 
-		// Reconcile the particle pool with the current tier. The ratchet only ever
-		// shrinks it: excess particles are flagged to fade out (draw() ramps their
-		// alpha, frame() removes them once invisible) instead of popping away.
-		function syncParticles() {
+		// Switch to a quality level. Only ever called while the canvas is hidden
+		// (during calibration) or on resize, so it can rebuild hard — no fades
+		// needed. Rebakes the digit sprites at the level's size and reconciles the
+		// particle count.
+		function applyLevel(lv: number) {
+			level = lv;
+			sizeMul = LEVELS[lv].sizeMul;
+			bakeSprites();
 			const target = particleTarget();
-			if (particles.length > target) {
-				for (let i = target; i < particles.length; i++) {
-					if (!particles[i].retiring) {
-						particles[i].retiring = true;
-						retiringCount++;
-					}
-				}
-			} else {
-				while (particles.length < target) particles.push(makeParticle());
-			}
+			if (particles.length > target) particles.length = target;
+			else while (particles.length < target) particles.push(makeParticle());
 		}
 
 		function resize() {
@@ -345,10 +332,9 @@
 			canvas.height = H * dpr;
 			ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 			buildMask();
-			// Particle density follows the active quality tier (see TIERS).
+			// Particle density follows the active quality level (see LEVELS).
 			const target = particleTarget();
 			particles = [];
-			retiringCount = 0;
 			for (let i = 0; i < target; i++) particles.push(makeParticle());
 			ctx.fillStyle = COLORS.bg;
 			ctx.fillRect(0, 0, W, H);
@@ -386,17 +372,23 @@
 		let resizePending = false;
 		let last = performance.now();
 
-		// Adaptive quality — a ONE-WAY ratchet. We only ever step DOWN a tier,
-		// never back up, so the field never pulses. frameEMA smooths the real
-		// inter-frame interval (≈ displayed FPS); slowAccum banks time spent over
-		// budget so a step needs sustained jank, not one spike. A step only trims
-		// particle count (which fades out smoothly) or framerate — never the canvas
-		// resolution — so adaptation is never a visible flash.
-		const FADE_MS = 1500; // intro fade-in
-		const GRACE_MS = 2800; // ignore startup churn before allowing any change
-		let frameEMA = 16.67;
-		let slowAccum = 0;
-		let introStart = 0;
+		// Invisible calibration. While the canvas is still hidden (opacity 0) we run
+		// the real animation and measure the true frame interval of each LEVEL,
+		// stepping down until one holds ~60fps (or we hit the floor). Only then do we
+		// fade the field in — so the adjustment is never seen. Measuring the real
+		// config with a median makes it accurate and robust to one-off spikes.
+		const SETTLE_MS = 250; // ignore this much startup churn before measuring
+		const MEAS_FRAMES = 16; // samples per level for the median
+		const MEAS_SKIP = 3; // discard frames right after a level change
+		const ACCEPT = 1.1; // accept a level if median ≤ budget × this (~55fps+)
+		const REVEAL_MS = 900; // fade the field in once calibrated
+		const LOADER_MS = 1000; // show the "calibrating…" hint if not done by now
+
+		let calibrated = reduced; // reduced-motion skips calibration entirely
+		let calStart = 0;
+		let calSamples: number[] = [];
+		let levelFrames = 0;
+		let revealStart = 0;
 		let introFade = reduced ? 1 : 0;
 		let scrollFade = 1;
 
@@ -404,15 +396,35 @@
 			canvas.style.opacity = (scrollFade * introFade).toFixed(3);
 		}
 
-		function monitor(rawMs: number) {
-			const budget = TIERS[tier].renderEvery * 16.67;
-			if (frameEMA > budget * 1.4) slowAccum += rawMs;
-			else slowAccum *= 0.85; // transient spikes bleed off; only sustained jank counts
-			if (slowAccum > 1200 && tier < TIERS.length - 1) {
-				tier++;
-				slowAccum = 0;
-				frameEMA = TIERS[tier].renderEvery * 16.67; // neutral for the new budget
-				syncParticles(); // only the particle count changes — no resolution flash
+		function median(a: number[]): number {
+			const s = [...a].sort((x, y) => x - y);
+			return s[s.length >> 1];
+		}
+
+		function calibrate(now: number, rawMs: number) {
+			if (!calStart) calStart = now;
+			const elapsed = now - calStart;
+			if (!calibrating && elapsed > LOADER_MS) calibrating = true;
+
+			// Skip startup churn, hidden tabs, and huge gaps — none reflect the real
+			// steady-state cost we're trying to measure.
+			if (elapsed < SETTLE_MS || document.hidden || rawMs >= 1000) return;
+
+			levelFrames++;
+			if (levelFrames <= MEAS_SKIP) return; // let the new level stabilise first
+			calSamples.push(rawMs);
+			if (calSamples.length < MEAS_FRAMES) return;
+
+			const med = median(calSamples);
+			const budget = LEVELS[level].renderEvery * 16.67;
+			if (med <= budget * ACCEPT || level >= LEVELS.length - 1) {
+				calibrated = true;
+				calibrating = false;
+				revealStart = now;
+			} else {
+				applyLevel(level + 1); // step down and measure the next real config
+				calSamples = [];
+				levelFrames = 0;
 			}
 		}
 
@@ -426,7 +438,7 @@
 
 			// Cap the render rate: ~60fps at renderEvery 1, ~30fps at renderEvery 2.
 			// Bounds workload and keeps the trail look identical on high-refresh panels.
-			if (now - last < TIERS[tier].renderEvery * 16.67 - 3) return;
+			if (now - last < LEVELS[level].renderEvery * 16.67 - 3) return;
 
 			const rawMs = now - last;
 			let dt = rawMs / 16.67;
@@ -443,27 +455,15 @@
 				update(p, dt);
 				draw(p);
 			}
-			if (retiringCount > 0) {
-				const before = particles.length;
-				particles = particles.filter((p) => !(p.retiring && p.fade <= 0));
-				retiringCount -= before - particles.length;
-			}
 
-			if (!introStart) introStart = now;
-			if (introFade < 1) {
-				introFade = Math.min(1, (now - introStart) / FADE_MS);
+			if (!calibrated) {
+				calibrate(now, rawMs);
+			} else if (introFade < 1) {
+				// Reveal: fade the settled field in. This is the only opacity change
+				// the user ever sees; the calibration itself happened while hidden.
+				if (!revealStart) revealStart = now;
+				introFade = Math.min(1, (now - revealStart) / REVEAL_MS);
 				applyOpacity();
-			}
-
-			// Feed the one-way monitor, but only AFTER the grace period: page load,
-			// hydration, font/sprite work and the warmup all jank the first couple of
-			// seconds in a way that says nothing about steady-state GPU cost. Skipping
-			// them keeps capable machines permanently at full quality. Also ignore
-			// hidden-tab and huge-gap frames; clamp the EMA input so one spike can't
-			// dominate while real jank (30–100ms+ frames) still registers.
-			if (!document.hidden && rawMs < 1000 && now - introStart > GRACE_MS) {
-				frameEMA += (Math.min(rawMs, 100) - frameEMA) * 0.1;
-				monitor(rawMs);
 			}
 		}
 
@@ -520,6 +520,13 @@
 
 <canvas bind:this={canvas} aria-hidden="true"></canvas>
 
+{#if calibrating}
+	<div class="cal" role="status" aria-live="polite">
+		<span class="cal-spinner" aria-hidden="true"></span>
+		<span>calibrating…</span>
+	</div>
+{/if}
+
 <style>
 	canvas {
 		position: fixed;
@@ -528,5 +535,53 @@
 		height: 100vh;
 		z-index: -1;
 		pointer-events: none;
+	}
+
+	.cal {
+		position: fixed;
+		inset: 0;
+		z-index: 2;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		gap: 12px;
+		font-family: 'MattHelm', Georgia, serif;
+		font-size: 15px;
+		letter-spacing: 0.14em;
+		color: var(--color-text-secondary);
+		pointer-events: none;
+		animation: cal-in 0.4s ease both;
+	}
+
+	.cal-spinner {
+		width: 14px;
+		height: 14px;
+		border: 2px solid transparent;
+		border-top-color: currentColor;
+		border-right-color: currentColor;
+		border-radius: 50%;
+		opacity: 0.85;
+		animation: cal-spin 0.8s linear infinite;
+	}
+
+	@keyframes cal-spin {
+		to {
+			transform: rotate(360deg);
+		}
+	}
+
+	@keyframes cal-in {
+		from {
+			opacity: 0;
+		}
+		to {
+			opacity: 1;
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.cal-spinner {
+			animation: none;
+		}
 	}
 </style>
