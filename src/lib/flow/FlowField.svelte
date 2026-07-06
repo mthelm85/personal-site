@@ -22,22 +22,59 @@
 	// by a screen-size factor (see sizeFactor) so "Matt Helm" stays legible on
 	// small screens and reads comfortably on large ones.
 	const SIZES = [6, 8, 10];
-	const GLOWS = 6;
+	const MAX_PARTICLES = 5000;
 
-	// Performance strategy — three decoupled levers, no resolution change (so
-	// digits are always crisp) and no loader:
-	//   • SIZE is set purely from the screen size, once (legibility).
-	//   • COUNT is eased DOWN, one-way, only when the machine shows sustained jank
-	//     (median-gated, after a grace period so startup churn doesn't count).
-	//     Culled digits fade out — never a hard pop — so there is no flicker.
-	//   • DWELL time grows as the field thins, so the fewer remaining digits linger
-	//     longer on the "Matt Helm" mask and keep the name dense even when the
-	//     ambient background gets sparse.
-	// Net: capable machines stay full; weak ones smoothly self-optimise over the
-	// first few seconds, keeping the name legible throughout.
-	const Q_MIN = 0.16; // never drop below 16% of the base particle count
-	const Q_STEP = 0.12; // fraction shed per reduction step
-	const DWELL_MAX = 2.75; // cap on the dwell-time multiplier
+	// The field renders with WebGL2 instanced rendering: every digit is one
+	// instance of a single quad, so the whole field is ONE draw call per frame
+	// instead of thousands of Canvas2D drawImage calls. That removes the draw-call
+	// bottleneck entirely, so integrated GPUs and phones run the full field at
+	// 60fps — no runtime quality throttling needed. Digit glyphs live in a texture
+	// atlas; glow is a per-instance brightness resolved in the fragment shader.
+	const PART_VS = `#version 300 es
+	layout(location=0) in vec2 aCorner;   // unit quad corner 0..1
+	layout(location=1) in vec2 aPos;      // instance centre, CSS px
+	layout(location=2) in float aSize;    // instance quad size, CSS px
+	layout(location=3) in float aDigit;   // 0..9
+	layout(location=4) in float aBright;  // 0..1 glow
+	uniform vec2 uRes;                    // viewport, CSS px
+	out vec2 vUv;
+	out float vBright;
+	void main() {
+		vec2 px = aPos + (aCorner - 0.5) * aSize;
+		vec2 clip = px / uRes * 2.0 - 1.0;
+		gl_Position = vec4(clip.x, -clip.y, 0.0, 1.0);
+		float col = floor(aDigit + 0.5);
+		vUv = vec2((col + aCorner.x) / 10.0, aCorner.y);
+		vBright = aBright;
+	}`;
+
+	const PART_FS = `#version 300 es
+	precision highp float;
+	in vec2 vUv;
+	in float vBright;
+	uniform sampler2D uAtlas;
+	uniform vec3 uRampLo, uRampHi;
+	uniform float uALo, uAHi;
+	out vec4 frag;
+	void main() {
+		float cov = texture(uAtlas, vUv).a;      // glyph coverage
+		vec3 col = mix(uRampLo, uRampHi, vBright);
+		float a = mix(uALo, uAHi, vBright) * cov;
+		frag = vec4(col * a, a);                 // premultiplied alpha
+	}`;
+
+	// Full-screen quad that washes the previous frame toward the background,
+	// producing the motion trails (the WebGL equivalent of a translucent fillRect).
+	const FADE_VS = `#version 300 es
+	layout(location=0) in vec2 aCorner;
+	void main() { gl_Position = vec4(aCorner * 2.0 - 1.0, 0.0, 1.0); }`;
+
+	const FADE_FS = `#version 300 es
+	precision highp float;
+	uniform vec3 uBg;
+	uniform float uTrailA;
+	out vec4 frag;
+	void main() { frag = vec4(uBg * uTrailA, uTrailA); }`;
 
 	// Bridge from the REPL stores into the simulation closure (assigned in onMount)
 	let applyUserFn: (fn: FieldFn | null) => void = () => {};
@@ -60,72 +97,226 @@
 	});
 
 	onMount(() => {
-		const ctx = canvas.getContext('2d')!;
 		const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-		// Canvas resolution is fixed for the whole session (never resized) so digits
-		// are always crisp. `q` is the current particle-count quality (1 = full),
-		// eased down only when needed. `sizeFactor` scales digit size to the screen
-		// and `dwellScale` grows as `q` falls to keep the name dense.
-		let q = 1;
-		let sizeFactor = 1;
-		let dwellScale = 1;
 		const dpr = Math.min(window.devicePixelRatio || 1, 2);
+		let sizeFactor = 1;
 
-		// Theme: canvas background tracks the site's --color-bg token; digit
-		// ramps are pale-on-dark or ink-on-light depending on the color scheme.
 		const lightMq = window.matchMedia('(prefers-color-scheme: light)');
 
-		function themeColors() {
+		// Numeric theme for the shaders: background, trail strength, and the digit
+		// colour ramp endpoints (pale-on-dark or ink-on-light), all as 0..1 floats.
+		function glTheme() {
 			const light = lightMq.matches;
-			let bg = getComputedStyle(document.documentElement)
-				.getPropertyValue('--color-bg')
-				.trim();
+			let bg = getComputedStyle(document.documentElement).getPropertyValue('--color-bg').trim();
 			if (!/^#[0-9a-fA-F]{6}$/.test(bg)) bg = light ? '#fafaf8' : '#08080f';
 			const br = parseInt(bg.slice(1, 3), 16);
 			const bgn = parseInt(bg.slice(3, 5), 16);
 			const bb = parseInt(bg.slice(5, 7), 16);
+			const ramp = (k: number): [number, number, number, number] =>
+				light
+					? [140 - k * 105, 148 - k * 78, 168 - k * 43, 0.3 + k * 0.45]
+					: [100 + k * 60, 122 + k * 70, 150 + k * 65, 0.28 + k * 0.38];
+			const lo = ramp(0);
+			const hi = ramp(1);
 			return {
-				bg,
-				trail: `rgba(${br},${bgn},${bb},0.32)`,
-				ramp: (k: number) =>
-					light
-						? `rgba(${(140 - k * 105) | 0},${(148 - k * 78) | 0},${(168 - k * 43) | 0},${(0.3 + k * 0.45).toFixed(2)})`
-						: `rgba(${(100 + k * 60) | 0},${(122 + k * 70) | 0},${(150 + k * 65) | 0},${(0.28 + k * 0.38).toFixed(2)})`
+				bgHex: bg,
+				bg: [br / 255, bgn / 255, bb / 255] as [number, number, number],
+				trailA: 0.32,
+				rampLo: [lo[0] / 255, lo[1] / 255, lo[2] / 255] as [number, number, number],
+				aLo: lo[3],
+				rampHi: [hi[0] / 255, hi[1] / 255, hi[2] / 255] as [number, number, number],
+				aHi: hi[3]
 			};
 		}
 
-		let COLORS = themeColors();
+		// --- WebGL resources -------------------------------------------------
+		let gl!: WebGL2RenderingContext;
+		let partProg!: WebGLProgram;
+		let fadeProg!: WebGLProgram;
+		let quadBuf!: WebGLBuffer;
+		let instBuf!: WebGLBuffer;
+		let partVao!: WebGLVertexArrayObject;
+		let fadeVao!: WebGLVertexArrayObject;
+		let atlasTex!: WebGLTexture;
+		let uResLoc: WebGLUniformLocation | null;
+		let uRampLoLoc: WebGLUniformLocation | null;
+		let uRampHiLoc: WebGLUniformLocation | null;
+		let uALoLoc: WebGLUniformLocation | null;
+		let uAHiLoc: WebGLUniformLocation | null;
+		let uBgLoc: WebGLUniformLocation | null;
+		let uTrailALoc: WebGLUniformLocation | null;
+		let bgCol: [number, number, number] = [0, 0, 0];
+		let bgHex = '#000';
+		const instanceData = new Float32Array(MAX_PARTICLES * 5);
 
-		type Sprite = { c: HTMLCanvasElement; w: number };
-		const sprites: Sprite[][][] = [];
-
-		function bakeSprites() {
-			for (let d = 0; d < 10; d++) {
-				sprites[d] = [];
-				for (let si = 0; si < SIZES.length; si++) {
-					sprites[d][si] = [];
-					for (let g = 0; g < GLOWS; g++) {
-						const fs = SIZES[si] * sizeFactor;
-						const pad = 2;
-						const c = document.createElement('canvas');
-						c.width = (fs + pad * 2) * dpr;
-						c.height = (fs + pad * 2) * dpr;
-						const cc = c.getContext('2d')!;
-						cc.scale(dpr, dpr);
-						cc.fillStyle = COLORS.ramp(g / (GLOWS - 1));
-						cc.font = `400 ${fs}px 'JetBrains Mono', Consolas, monospace`;
-						cc.textAlign = 'center';
-						cc.textBaseline = 'middle';
-						cc.fillText(String(d), fs / 2 + pad, fs / 2 + pad);
-						sprites[d][si][g] = { c, w: fs + pad * 2 };
-					}
-				}
+		function createProgram(vsSrc: string, fsSrc: string): WebGLProgram {
+			const vs = gl.createShader(gl.VERTEX_SHADER)!;
+			gl.shaderSource(vs, vsSrc);
+			gl.compileShader(vs);
+			const fs = gl.createShader(gl.FRAGMENT_SHADER)!;
+			gl.shaderSource(fs, fsSrc);
+			gl.compileShader(fs);
+			const p = gl.createProgram()!;
+			gl.attachShader(p, vs);
+			gl.attachShader(p, fs);
+			gl.linkProgram(p);
+			if (!gl.getProgramParameter(p, gl.LINK_STATUS)) {
+				console.error(
+					'FlowField shader link failed:',
+					gl.getProgramInfoLog(p),
+					gl.getShaderInfoLog(vs),
+					gl.getShaderInfoLog(fs)
+				);
 			}
+			gl.deleteShader(vs);
+			gl.deleteShader(fs);
+			return p;
 		}
 
-		bakeSprites();
+		function buildAtlas() {
+			// Digits 0-9 baked white into a 10-cell strip; the shader tints them.
+			const cell = 64;
+			const off = document.createElement('canvas');
+			off.width = cell * 10;
+			off.height = cell;
+			const octx = off.getContext('2d')!;
+			octx.clearRect(0, 0, off.width, off.height);
+			octx.fillStyle = '#fff';
+			octx.font = `400 ${Math.round(cell * 0.7)}px 'JetBrains Mono', Consolas, monospace`;
+			octx.textAlign = 'center';
+			octx.textBaseline = 'middle';
+			for (let d = 0; d < 10; d++) octx.fillText(String(d), d * cell + cell / 2, cell / 2);
+			if (!atlasTex) atlasTex = gl.createTexture()!;
+			gl.bindTexture(gl.TEXTURE_2D, atlasTex);
+			gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false);
+			gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, off);
+			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+		}
 
+		function applyThemeUniforms() {
+			const T = glTheme();
+			bgCol = T.bg;
+			bgHex = T.bgHex;
+			gl.useProgram(partProg);
+			gl.uniform3fv(uRampLoLoc, T.rampLo);
+			gl.uniform3fv(uRampHiLoc, T.rampHi);
+			gl.uniform1f(uALoLoc, T.aLo);
+			gl.uniform1f(uAHiLoc, T.aHi);
+			gl.useProgram(fadeProg);
+			gl.uniform3fv(uBgLoc, T.bg);
+			gl.uniform1f(uTrailALoc, T.trailA);
+		}
+
+		function initGL(): boolean {
+			const g = canvas.getContext('webgl2', {
+				alpha: true,
+				premultipliedAlpha: true,
+				preserveDrawingBuffer: true, // keep the frame so trails accumulate
+				antialias: false
+			});
+			if (!g) return false;
+			gl = g;
+
+			partProg = createProgram(PART_VS, PART_FS);
+			fadeProg = createProgram(FADE_VS, FADE_FS);
+
+			uResLoc = gl.getUniformLocation(partProg, 'uRes');
+			uRampLoLoc = gl.getUniformLocation(partProg, 'uRampLo');
+			uRampHiLoc = gl.getUniformLocation(partProg, 'uRampHi');
+			uALoLoc = gl.getUniformLocation(partProg, 'uALo');
+			uAHiLoc = gl.getUniformLocation(partProg, 'uAHi');
+			gl.useProgram(partProg);
+			gl.uniform1i(gl.getUniformLocation(partProg, 'uAtlas'), 0);
+			uBgLoc = gl.getUniformLocation(fadeProg, 'uBg');
+			uTrailALoc = gl.getUniformLocation(fadeProg, 'uTrailA');
+
+			quadBuf = gl.createBuffer()!;
+			gl.bindBuffer(gl.ARRAY_BUFFER, quadBuf);
+			gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([0, 0, 1, 0, 0, 1, 1, 1]), gl.STATIC_DRAW);
+
+			instBuf = gl.createBuffer()!;
+			gl.bindBuffer(gl.ARRAY_BUFFER, instBuf);
+			gl.bufferData(gl.ARRAY_BUFFER, MAX_PARTICLES * 5 * 4, gl.DYNAMIC_DRAW);
+
+			const stride = 20; // 5 floats
+			partVao = gl.createVertexArray()!;
+			gl.bindVertexArray(partVao);
+			gl.bindBuffer(gl.ARRAY_BUFFER, quadBuf);
+			gl.enableVertexAttribArray(0);
+			gl.vertexAttribPointer(0, 2, gl.FLOAT, false, 0, 0);
+			gl.bindBuffer(gl.ARRAY_BUFFER, instBuf);
+			gl.enableVertexAttribArray(1);
+			gl.vertexAttribPointer(1, 2, gl.FLOAT, false, stride, 0);
+			gl.vertexAttribDivisor(1, 1);
+			gl.enableVertexAttribArray(2);
+			gl.vertexAttribPointer(2, 1, gl.FLOAT, false, stride, 8);
+			gl.vertexAttribDivisor(2, 1);
+			gl.enableVertexAttribArray(3);
+			gl.vertexAttribPointer(3, 1, gl.FLOAT, false, stride, 12);
+			gl.vertexAttribDivisor(3, 1);
+			gl.enableVertexAttribArray(4);
+			gl.vertexAttribPointer(4, 1, gl.FLOAT, false, stride, 16);
+			gl.vertexAttribDivisor(4, 1);
+
+			fadeVao = gl.createVertexArray()!;
+			gl.bindVertexArray(fadeVao);
+			gl.bindBuffer(gl.ARRAY_BUFFER, quadBuf);
+			gl.enableVertexAttribArray(0);
+			gl.vertexAttribPointer(0, 2, gl.FLOAT, false, 0, 0);
+			gl.bindVertexArray(null);
+
+			buildAtlas();
+			// Re-bake once the web font loads, in case it wasn't ready at startup.
+			document.fonts?.ready.then(() => {
+				if (gl && !gl.isContextLost()) buildAtlas();
+			});
+
+			gl.disable(gl.DEPTH_TEST);
+			gl.enable(gl.BLEND);
+			gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA); // premultiplied "over"
+			applyThemeUniforms();
+			return true;
+		}
+
+		function glClearBg() {
+			gl.clearColor(bgCol[0], bgCol[1], bgCol[2], 1);
+			gl.clear(gl.COLOR_BUFFER_BIT);
+		}
+
+		function glFade() {
+			gl.useProgram(fadeProg);
+			gl.bindVertexArray(fadeVao);
+			gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+		}
+
+		function glParticles() {
+			const n = particles.length;
+			if (n === 0) return;
+			let o = 0;
+			for (let i = 0; i < n; i++) {
+				const p = particles[i];
+				instanceData[o++] = p.x;
+				instanceData[o++] = p.y;
+				instanceData[o++] = SIZES[p.si] * sizeFactor * 1.5;
+				instanceData[o++] = p.d;
+				let b = p.glow;
+				b = b < 0 ? 0 : b > 1 ? 1 : b;
+				instanceData[o++] = b;
+			}
+			gl.bindBuffer(gl.ARRAY_BUFFER, instBuf);
+			gl.bufferSubData(gl.ARRAY_BUFFER, 0, instanceData, 0, n * 5);
+			gl.activeTexture(gl.TEXTURE0);
+			gl.bindTexture(gl.TEXTURE_2D, atlasTex);
+			gl.useProgram(partProg);
+			gl.uniform2f(uResLoc, W, H);
+			gl.bindVertexArray(partVao);
+			gl.drawArraysInstanced(gl.TRIANGLE_STRIP, 0, 4, n);
+		}
+
+		// --- Simulation ------------------------------------------------------
 		interface Particle {
 			x: number;
 			y: number;
@@ -137,15 +328,12 @@
 			dwell: number;
 			wasInside: boolean;
 			nextFlip: number;
-			fade: number; // 1 = fully visible; ramps to 0 when culled on a reduction
-			retiring: boolean; // marked for removal once its fade reaches 0
 		}
 
 		let W = 0;
 		let H = 0;
 		let mask = new Uint8Array(0);
 		let particles: Particle[] = [];
-		let retiringCount = 0; // how many particles are currently fading out
 		let progress = 0;
 		let depth = 0;
 		let t = 0;
@@ -214,33 +402,20 @@
 				glow: 0,
 				dwell: 0,
 				wasInside: false,
-				nextFlip: Math.random() * 200,
-				fade: 1,
-				retiring: false
+				nextFlip: Math.random() * 200
 			};
 		}
 
 		function update(p: Particle, dt: number) {
-			// A culled digit freezes and dissolves in place. If it kept moving while
-			// fading it would smear a fading streak across the field ("weird lines");
-			// freezing removes the streak so it just melts away where it sits.
-			if (p.retiring) {
-				p.fade -= 0.04 * dt; // ~0.4s dissolve
-				return;
-			}
-
 			const swirlF = Math.max(0, 1 - progress * 1.35);
 			const biasV = 1.35 + 2.6 * progress;
 			const dwellOn = progress < 0.12;
 
 			const xi = p.x | 0;
 			const yi = p.y | 0;
-			const inside =
-				dwellOn && xi >= 0 && xi < W && yi >= 0 && yi < H ? mask[yi * W + xi] : 0;
+			const inside = dwellOn && xi >= 0 && xi < W && yi >= 0 && yi < H ? mask[yi * W + xi] : 0;
 
-			// Dwell grows as the field thins (dwellScale ≥ 1), so fewer digits still
-			// keep the "Matt Helm" mask densely populated.
-			if (inside && !p.wasInside) p.dwell = (360 + Math.random() * 480) * dwellScale;
+			if (inside && !p.wasInside) p.dwell = 360 + Math.random() * 480;
 			if (!inside) p.dwell = 0;
 			p.wasInside = !!inside;
 			const stuck = inside && p.dwell > 0;
@@ -311,39 +486,8 @@
 			}
 		}
 
-		function draw(p: Particle) {
-			let g = (p.glow * (GLOWS - 1) + 0.5) | 0;
-			if (g > GLOWS - 1) g = GLOWS - 1;
-			if (g < 0) g = 0;
-			const sp = sprites[p.d][p.si][g];
-			if (p.fade < 1) {
-				ctx.globalAlpha = p.fade > 0 ? p.fade : 0;
-				ctx.drawImage(sp.c, p.x - sp.w / 2, p.y - sp.w / 2, sp.w, sp.w);
-				ctx.globalAlpha = 1;
-			} else {
-				ctx.drawImage(sp.c, p.x - sp.w / 2, p.y - sp.w / 2, sp.w, sp.w);
-			}
-		}
-
 		function particleTarget(): number {
-			const base = Math.min(5000, Math.floor((W * H) / 200));
-			return Math.floor(base * q);
-		}
-
-		// One-way quality reduction: lower q, grow the dwell multiplier to keep the
-		// name dense, and fade out the now-excess particles (draw() ramps their
-		// alpha; frame() removes them once invisible). Never a hard pop, never a
-		// resolution or sprite change — so no flicker.
-		function reduceQuality() {
-			q = Math.max(Q_MIN, q - Q_STEP);
-			dwellScale = Math.min(DWELL_MAX, 1 / q);
-			const target = particleTarget();
-			for (let i = target; i < particles.length; i++) {
-				if (!particles[i].retiring) {
-					particles[i].retiring = true;
-					retiringCount++;
-				}
-			}
+			return Math.min(MAX_PARTICLES, Math.floor((W * H) / 200));
 		}
 
 		// Digit size tracks the smaller screen dimension so "Matt Helm" stays
@@ -358,29 +502,16 @@
 			H = window.innerHeight;
 			canvas.width = W * dpr;
 			canvas.height = H * dpr;
-			ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+			gl.viewport(0, 0, canvas.width, canvas.height);
 			computeSizeFactor();
-			bakeSprites(); // re-bake digits at the screen-appropriate size
 			buildMask();
 			const target = particleTarget();
 			particles = [];
-			retiringCount = 0;
 			for (let i = 0; i < target; i++) particles.push(makeParticle());
-			ctx.fillStyle = COLORS.bg;
-			ctx.fillRect(0, 0, W, H);
+			glClearBg();
 			rebuildUserGrid();
 			if (reduced) staticFrame();
 			else warmup(500);
-		}
-
-		function onScroll() {
-			progress = Math.min(1, Math.max(0, window.scrollY / (window.innerHeight * scrollRange)));
-			depth = window.scrollY * 0.0006;
-			scrollFade =
-				progress < fadeStart
-					? 1
-					: 1 - (1 - ambient) * Math.min(1, (progress - fadeStart) / (1 - fadeStart));
-			applyOpacity();
 		}
 
 		function warmup(steps: number) {
@@ -393,32 +524,15 @@
 		function staticFrame() {
 			progress = 0;
 			warmup(700);
-			ctx.fillStyle = COLORS.bg;
-			ctx.fillRect(0, 0, W, H);
-			for (const p of particles) draw(p);
+			glClearBg();
+			glParticles();
 		}
 
+		// --- Presentation / loop --------------------------------------------
 		let raf = 0;
 		let resizePending = false;
 		let last = performance.now();
-
-		// One-way, median-gated quality reducer. We measure the real inter-frame
-		// interval and, only after a grace period (so page-load churn doesn't
-		// count), shed digits whenever a robust MEDIAN of recent frames is over
-		// budget. It only ever reduces — never restores — so it converges within a
-		// few seconds and never pulses. A short cooldown after each step lets the
-		// fade finish and the median re-measure the lighter config before deciding
-		// again, which prevents overshoot. renderEvery drops to 2 (≈30fps) only as a
-		// last resort once particle count is already at the floor.
-		const GRACE_MS = 1500; // ignore this much startup churn before reducing
-		const STEP_COOLDOWN = 700; // settle time after a reduction before the next
-		const JANK = 1.2; // median over budget × this ⇒ shed (≈ below 50fps)
-		const FADE_MS = 700; // brief intro fade-in (does NOT hide the adaptation)
-
-		let renderEvery = 1;
-		let started = 0;
-		let lastStepAt = -1e9;
-		let medBuf: number[] = [];
+		const FADE_MS = 700; // brief intro fade-in for polish
 		let introStart = 0;
 		let introFade = reduced ? 1 : 0;
 		let scrollFade = 1;
@@ -427,28 +541,14 @@
 			canvas.style.opacity = (scrollFade * introFade).toFixed(3);
 		}
 
-		function median(a: number[]): number {
-			const s = [...a].sort((x, y) => x - y);
-			return s[s.length >> 1];
-		}
-
-		function monitor(now: number, rawMs: number) {
-			if (document.hidden || rawMs >= 1000) return; // ignore tab-switch / huge gaps
-			medBuf.push(rawMs);
-			if (medBuf.length > 24) medBuf.shift();
-
-			if (now - started < GRACE_MS) return; // let startup churn pass
-			if (now - lastStepAt < STEP_COOLDOWN) return; // let the last step settle
-			if (medBuf.length < 16) return;
-
-			const budget = renderEvery * 16.67;
-			if (median(medBuf) <= budget * JANK) return; // smooth enough — stop reducing
-
-			if (q > Q_MIN) reduceQuality();
-			else if (renderEvery === 1) renderEvery = 2; // last resort: halve the framerate
-			else return; // already at the floor
-			lastStepAt = now;
-			medBuf = []; // re-measure the new, lighter config from scratch
+		function onScroll() {
+			progress = Math.min(1, Math.max(0, window.scrollY / (window.innerHeight * scrollRange)));
+			depth = window.scrollY * 0.0006;
+			scrollFade =
+				progress < fadeStart
+					? 1
+					: 1 - (1 - ambient) * Math.min(1, (progress - fadeStart) / (1 - fadeStart));
+			applyOpacity();
 		}
 
 		function frame(now: number) {
@@ -456,15 +556,14 @@
 			if (!resizePending && (window.innerWidth !== W || window.innerHeight !== H)) {
 				resize();
 				onScroll();
-				last = now; // don't charge the blocking resize/warmup as a slow frame
+				last = now;
 			}
 
-			// Cap the render rate: ~60fps at renderEvery 1, ~30fps at renderEvery 2.
-			// Bounds workload and keeps the trail look identical on high-refresh panels.
-			if (now - last < renderEvery * 16.67 - 3) return;
+			// ~60fps cap: bounds work and keeps the trail look identical on
+			// high-refresh panels (the trail fade is per-frame).
+			if (now - last < 16.67 - 3) return;
 
-			const rawMs = now - last;
-			let dt = rawMs / 16.67;
+			let dt = (now - last) / 16.67;
 			if (dt > 3) dt = 3;
 			last = now;
 			t += 0.016 * dt;
@@ -472,27 +571,15 @@
 			userW += (uTarget - userW) * 0.05 * dt;
 			if (userW < 0.0005) userW = uTarget === 0 ? 0 : userW;
 
-			ctx.fillStyle = COLORS.trail;
-			ctx.fillRect(0, 0, W, H);
-			for (const p of particles) {
-				update(p, dt);
-				draw(p);
-			}
-			if (retiringCount > 0) {
-				const before = particles.length;
-				particles = particles.filter((p) => !(p.retiring && p.fade <= 0));
-				retiringCount -= before - particles.length;
-			}
+			for (const p of particles) update(p, dt);
+			glFade();
+			glParticles();
 
-			// Brief intro fade-in for polish (the adaptation that follows is visible).
 			if (!introStart) introStart = now;
 			if (introFade < 1) {
 				introFade = Math.min(1, (now - introStart) / FADE_MS);
 				applyOpacity();
 			}
-
-			if (!started) started = now;
-			monitor(now, rawMs);
 		}
 
 		let resizeTimer: ReturnType<typeof setTimeout>;
@@ -516,18 +603,39 @@
 		};
 
 		const onScheme = () => {
-			COLORS = themeColors();
-			bakeSprites();
-			canvas.style.backgroundColor = COLORS.bg;
-			ctx.fillStyle = COLORS.bg;
-			ctx.fillRect(0, 0, W, H);
+			applyThemeUniforms();
+			canvas.style.backgroundColor = bgHex;
+			glClearBg();
 			if (reduced) staticFrame();
 		};
 
+		const onLost = (e: Event) => {
+			e.preventDefault();
+			cancelAnimationFrame(raf);
+		};
+		const onRestored = () => {
+			if (!initGL()) return;
+			resize();
+			onScroll();
+			if (!reduced) {
+				last = performance.now();
+				raf = requestAnimationFrame(frame);
+			}
+		};
+
+		// --- Boot ------------------------------------------------------------
+		if (!initGL()) {
+			// No WebGL2 (very rare): leave the dark background, no animation.
+			canvas.style.backgroundColor = glTheme().bgHex;
+			return;
+		}
+
+		canvas.addEventListener('webglcontextlost', onLost, false);
+		canvas.addEventListener('webglcontextrestored', onRestored, false);
 		lightMq.addEventListener('change', onScheme);
 		window.addEventListener('resize', onResize);
 		window.addEventListener('scroll', onScroll, { passive: true });
-		canvas.style.backgroundColor = COLORS.bg;
+		canvas.style.backgroundColor = bgHex;
 		resize();
 		onScroll();
 		if (!reduced) {
@@ -539,6 +647,8 @@
 			applyUserFn = () => {};
 			cancelAnimationFrame(raf);
 			clearTimeout(resizeTimer);
+			canvas.removeEventListener('webglcontextlost', onLost);
+			canvas.removeEventListener('webglcontextrestored', onRestored);
 			lightMq.removeEventListener('change', onScheme);
 			window.removeEventListener('resize', onResize);
 			window.removeEventListener('scroll', onScroll);
