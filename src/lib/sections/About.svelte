@@ -1,25 +1,5 @@
 <script lang="ts">
-	const SKILLS = [
-		'Julia',
-		'Rust',
-		'Python',
-		'TypeScript',
-		'SQL',
-		'R',
-		'HTML / CSS',
-		'Svelte'
-	];
-
-	const DOMAINS = [
-		'Agentic AI (MCP)',
-		'Causal Inference',
-		'Optimization & Simulation',
-		'Labor Economics',
-		'Geospatial Analytics',
-		'Workforce Forecasting',
-		'Statistical Modeling',
-		'Regulatory Compliance'
-	];
+	import { SKILLS, DOMAINS } from '$lib/data/identity';
 
 	const PARAGRAPHS = [
 		`For over ten years at the U.S. Department of Labor, I’ve bridged the gap between data science and federal policy. My work spans the full pipeline: from data engineering to analysis, modeling, and forecasting — all the way through to deployment.`,

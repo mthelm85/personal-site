@@ -2,12 +2,15 @@
 	import { onMount } from 'svelte';
 	import { browser } from '$app/environment';
 	import { activeSection } from '$lib/stores/scroll';
+	import { graphJsonLd } from '$lib/data/graph';
 
 	import FlowField from '$lib/flow/FlowField.svelte';
 	import About from '$lib/sections/About.svelte';
 	import Projects from '$lib/sections/Projects.svelte';
 	import Experience from '$lib/sections/Experience.svelte';
 	import Contact from '$lib/sections/Contact.svelte';
+
+	const jsonLd = `<script type="application/ld+json">${graphJsonLd()}</${'script'}>`;
 
 	const SECTION_IDS = ['hero', 'about', 'projects', 'experience', 'contact'];
 
@@ -39,6 +42,10 @@
 		};
 	});
 </script>
+
+<svelte:head>
+	{@html jsonLd}
+</svelte:head>
 
 <FlowField />
 

@@ -1,0 +1,37 @@
+@prefix schema: <https://schema.org/> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+
+<https://matthelm.pro/#me>
+    a schema:Person, foaf:Person ;
+    schema:name "Matt Helm" ;
+    foaf:name "Matt Helm" ;
+    schema:url <https://matthelm.pro/> ;
+    foaf:homepage <https://matthelm.pro/> ;
+    schema:jobTitle "Data Scientist" ;
+    schema:worksFor [
+        a schema:GovernmentOrganization ;
+        schema:name "U.S. Department of Labor" ;
+        schema:url <https://www.dol.gov/>
+    ] ;
+    schema:sameAs <https://github.com/mthelm85>,
+        <https://discourse.julialang.org/u/mthelm85> ;
+    foaf:account <https://github.com/mthelm85>,
+        <https://discourse.julialang.org/u/mthelm85> ;
+    schema:knowsAbout "Agentic AI (MCP)", "Causal Inference",
+        "Optimization & Simulation", "Labor Economics",
+        "Geospatial Analytics", "Workforce Forecasting",
+        "Statistical Modeling", "Regulatory Compliance",
+        "Julia", "Rust", "Python", "TypeScript", "SQL", "R" ;
+    schema:alumniOf [
+        a schema:CollegeOrUniversity ;
+        schema:name "West Texas A&M University"
+    ], [
+        a schema:CollegeOrUniversity ;
+        schema:name "University of West Florida"
+    ] .
+
+<https://matthelm.pro/#website>
+    a schema:WebSite ;
+    schema:url <https://matthelm.pro/> ;
+    schema:name "Matt Helm — Data Scientist" ;
+    schema:author <https://matthelm.pro/#me> .
