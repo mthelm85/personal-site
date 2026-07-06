@@ -21,6 +21,22 @@
 	const SIZES = [6, 8, 10];
 	const GLOWS = 6;
 
+	// Quality tiers, best → worst. Tier 0 reproduces the original full-quality
+	// settings exactly, so capable machines are untouched. A runtime monitor
+	// (in frame()) steps between tiers based on measured render-work time, so a
+	// weak GPU — integrated laptop graphics, thermal throttling — settles at a
+	// sustainable tier instead of stuttering at tier 0 forever.
+	//   ppp         pixels-per-particle (lower = denser)
+	//   cap         hard particle ceiling
+	//   dprCap      device-pixel-ratio cap (the trail fill scales with this)
+	//   renderEvery render 1-in-N frames (2 ≈ 30fps) — last-resort lever
+	const TIERS = [
+		{ ppp: 200, cap: 8000, dprCap: 2, renderEvery: 1 },
+		{ ppp: 300, cap: 5000, dprCap: 2, renderEvery: 1 },
+		{ ppp: 460, cap: 3000, dprCap: 1.5, renderEvery: 1 },
+		{ ppp: 650, cap: 1800, dprCap: 1, renderEvery: 2 }
+	];
+
 	// Bridge from the REPL stores into the simulation closure (assigned in onMount)
 	let applyUserFn: (fn: FieldFn | null) => void = () => {};
 
@@ -43,8 +59,23 @@
 
 	onMount(() => {
 		const ctx = canvas.getContext('2d')!;
-		const dpr = Math.min(window.devicePixelRatio || 1, 2);
 		const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+		// Seed a starting tier from cheap hardware hints, then let the runtime
+		// monitor make the real call. These signals are coarse and can't see GPU
+		// fill-rate or throttling, so they only nudge the starting point — the
+		// monitor promotes a wrongly-demoted machine back up within seconds.
+		function seedTier(): number {
+			const nav = navigator as any;
+			const cores = nav.hardwareConcurrency || 4;
+			const mem = nav.deviceMemory || 4;
+			let s = 0;
+			if (cores <= 4 || mem <= 4) s = 1;
+			if (cores <= 2 || mem <= 2 || nav.connection?.saveData) s = 2;
+			return s;
+		}
+		let tier = seedTier();
+		let dpr = Math.min(window.devicePixelRatio || 1, TIERS[tier].dprCap);
 
 		// Theme: canvas background tracks the site's --color-bg token; digit
 		// ramps are pale-on-dark or ink-on-light depending on the color scheme.
@@ -278,6 +309,34 @@
 			ctx.drawImage(sp.c, p.x - sp.w / 2, p.y - sp.w / 2, sp.w, sp.w);
 		}
 
+		function particleTarget(): number {
+			const T = TIERS[tier];
+			return Math.min(T.cap, Math.floor((W * H) / T.ppp));
+		}
+
+		// Grow/shrink the particle pool to the current tier without a full reset.
+		function syncParticles() {
+			const target = particleTarget();
+			if (particles.length > target) particles.length = target;
+			else while (particles.length < target) particles.push(makeParticle());
+		}
+
+		// Apply the current tier: if the DPR cap changed, resize the backing store
+		// and rebake sprites at the new resolution, then reconcile particle count.
+		function applyTier() {
+			const newDpr = Math.min(window.devicePixelRatio || 1, TIERS[tier].dprCap);
+			if (newDpr !== dpr) {
+				dpr = newDpr;
+				canvas.width = W * dpr;
+				canvas.height = H * dpr;
+				ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+				bakeSprites();
+				ctx.fillStyle = COLORS.bg;
+				ctx.fillRect(0, 0, W, H);
+			}
+			syncParticles();
+		}
+
 		function resize() {
 			W = window.innerWidth;
 			H = window.innerHeight;
@@ -285,9 +344,8 @@
 			canvas.height = H * dpr;
 			ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 			buildMask();
-			// Adjust density based on screen size: smaller screens get fewer digits, larger screens get more
-			const pixelsPerParticle = 200; // Decrease for more digits, increase for fewer
-			const target = Math.min(8000, Math.floor((W * H) / pixelsPerParticle));
+			// Particle density follows the active quality tier (see TIERS).
+			const target = particleTarget();
 			particles = [];
 			for (let i = 0; i < target; i++) particles.push(makeParticle());
 			ctx.fillStyle = COLORS.bg;
@@ -325,25 +383,77 @@
 		let raf = 0;
 		let resizePending = false;
 		let last = performance.now();
+		let tick = 0;
+		// Runtime performance monitor. frameEMA is a smoothed measure of how long
+		// the render work takes; slow/fastAccum bank wall-clock time spent over or
+		// under budget so a tier change needs sustained evidence, not one spike.
+		let frameEMA = 16.67;
+		let slowAccum = 0;
+		let fastAccum = 0;
+		let tierFloor = 0; // best tier we're still allowed to promote back to
+		let downAt = -1e9; // last demotion time (ms); gates promotions
+		let upAt = -1e9; // last promotion time (ms); detects unstable promotions
+
+		function monitor(now: number, rawMs: number) {
+			const budget = TIERS[tier].renderEvery * 16.67;
+			if (frameEMA > budget * 0.85) {
+				slowAccum += rawMs;
+				fastAccum = 0;
+			} else if (frameEMA < budget * 0.45) {
+				fastAccum += rawMs;
+				slowAccum = 0;
+			} else {
+				slowAccum *= 0.9;
+				fastAccum *= 0.9;
+			}
+
+			if (slowAccum > 1000 && tier < TIERS.length - 1) {
+				// A promotion that unravels this fast means that tier is unstable on
+				// this machine — floor it so we stop bouncing back into it.
+				if (now - upAt < 8000) tierFloor = tier;
+				tier++;
+				downAt = now;
+				slowAccum = fastAccum = 0;
+				frameEMA = TIERS[tier].renderEvery * 16.67 * 0.5;
+				applyTier();
+			} else if (fastAccum > 4000 && tier > tierFloor && now - downAt > 10000) {
+				tier--;
+				upAt = now;
+				slowAccum = fastAccum = 0;
+				frameEMA = TIERS[tier].renderEvery * 16.67 * 0.5;
+				applyTier();
+			}
+		}
+
 		function frame(now: number) {
 			raf = requestAnimationFrame(frame);
 			if (!resizePending && (window.innerWidth !== W || window.innerHeight !== H)) {
 				resize();
 				onScroll();
 			}
-			let dt = (now - last) / 16.67;
+			tick++;
+			if (tick % TIERS[tier].renderEvery !== 0) return;
+
+			const rawMs = now - last;
+			let dt = rawMs / 16.67;
 			if (dt > 3) dt = 3;
 			last = now;
 			t += 0.016 * dt;
 			const uTarget = userFn ? 1 : 0;
 			userW += (uTarget - userW) * 0.05 * dt;
 			if (userW < 0.0005) userW = uTarget === 0 ? 0 : userW;
+
+			const workStart = performance.now();
 			ctx.fillStyle = COLORS.trail;
 			ctx.fillRect(0, 0, W, H);
 			for (const p of particles) {
 				update(p, dt);
 				draw(p);
 			}
+			// Measure only the render work — immune to rAF throttling in background
+			// tabs — and feed it to the tier monitor.
+			frameEMA += (performance.now() - workStart - frameEMA) * 0.06;
+			monitor(now, rawMs);
 		}
 
 		let resizeTimer: ReturnType<typeof setTimeout>;
