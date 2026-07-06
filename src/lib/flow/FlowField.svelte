@@ -23,19 +23,21 @@
 
 	// Quality tiers, best → worst. Tier 0 reproduces the original full-quality
 	// look. The adaptive monitor only ever steps DOWN through these (a one-way
-	// ratchet, never back up), so the field settles once during a brief startup
-	// window and then never visibly pulses.
-	//   ppp         pixels-per-particle (lower = denser); the particle lever
+	// ratchet, never back up), and only after a startup grace period, so a
+	// capable machine is never touched. The levers are deliberately limited to
+	// particle count and framerate — NOT render resolution — because changing the
+	// canvas resolution at runtime clears the buffer (a visible flicker) and
+	// upscales (blur). Resolution is fixed for the session instead.
+	//   ppp         pixels-per-particle (lower = denser); the primary lever
 	//   cap         hard particle ceiling
-	//   scale       internal render-resolution multiplier; the fill-rate lever —
-	//               the canvas backing store shrinks and CSS upscales it, which
-	//               is what shrinking the browser window did by hand
 	//   renderEvery render 1-in-N frames (2 ≈ 30fps) — last-resort lever
+	// The drop in particle draws is what actually relieves a fill-bound GPU here
+	// (confirmed by testing), so we don't need the resolution lever.
 	const TIERS = [
-		{ ppp: 200, cap: 8000, scale: 1.0, renderEvery: 1 },
-		{ ppp: 300, cap: 5000, scale: 1.0, renderEvery: 1 },
-		{ ppp: 460, cap: 3000, scale: 0.8, renderEvery: 1 },
-		{ ppp: 650, cap: 1800, scale: 0.65, renderEvery: 2 }
+		{ ppp: 200, cap: 8000, renderEvery: 1 },
+		{ ppp: 320, cap: 4500, renderEvery: 1 },
+		{ ppp: 480, cap: 2500, renderEvery: 1 },
+		{ ppp: 750, cap: 1200, renderEvery: 2 }
 	];
 
 	// Bridge from the REPL stores into the simulation closure (assigned in onMount)
@@ -62,20 +64,12 @@
 		const ctx = canvas.getContext('2d')!;
 		const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-		// Seed a starting tier from cheap hardware hints. Because the ratchet only
-		// steps down, the seed is deliberately optimistic — start at (or near) full
-		// quality and let the startup calibration walk it down if needed, so
-		// capable machines are never wrongly penalised.
-		function seedTier(): number {
-			const nav = navigator as any;
-			const cores = nav.hardwareConcurrency || 4;
-			const mem = nav.deviceMemory || 4;
-			let s = 0;
-			if (cores <= 2 || mem <= 2 || nav.connection?.saveData) s = 1;
-			return s;
-		}
-		let tier = seedTier();
-		let dpr = Math.min(window.devicePixelRatio || 1, 2) * TIERS[tier].scale;
+		// Everyone starts at full quality. The one-way monitor only trims quality
+		// after a grace period (see frame()) if the machine shows sustained jank in
+		// steady state. Canvas resolution is fixed for the whole session — never
+		// resized at runtime — so there is no flicker or blur from adaptation.
+		let tier = 0;
+		const dpr = Math.min(window.devicePixelRatio || 1, 2);
 
 		// Theme: canvas background tracks the site's --color-bg token; digit
 		// ramps are pale-on-dark or ink-on-light depending on the color scheme.
@@ -305,7 +299,7 @@
 				p.nextFlip = 60 + Math.random() * 240;
 			}
 
-			if (p.retiring) p.fade -= 0.05 * dt; // ~0.33s dissolve
+			if (p.retiring) p.fade -= 0.03 * dt; // gentle ~0.55s dissolve
 		}
 
 		function draw(p: Particle) {
@@ -342,23 +336,6 @@
 			} else {
 				while (particles.length < target) particles.push(makeParticle());
 			}
-		}
-
-		// Apply the current tier: if the render resolution changed, resize the
-		// backing store and rebake sprites at the new scale, then reconcile the
-		// particle count.
-		function applyTier() {
-			const newDpr = Math.min(window.devicePixelRatio || 1, 2) * TIERS[tier].scale;
-			if (newDpr !== dpr) {
-				dpr = newDpr;
-				canvas.width = W * dpr;
-				canvas.height = H * dpr;
-				ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-				bakeSprites();
-				ctx.fillStyle = COLORS.bg;
-				ctx.fillRect(0, 0, W, H);
-			}
-			syncParticles();
 		}
 
 		function resize() {
@@ -410,16 +387,15 @@
 		let last = performance.now();
 
 		// Adaptive quality — a ONE-WAY ratchet. We only ever step DOWN a tier,
-		// never back up, so the field never visibly pulses. frameEMA smooths the
-		// real inter-frame interval (≈ displayed FPS); slowAccum banks time spent
-		// over budget so a step needs sustained jank, not one spike. During the
-		// brief startup window (`locked === false`, hidden behind the intro
-		// fade-in) steps are eager; afterwards `locked` turns further steps into a
-		// rare emergency-only safety valve (e.g. thermal throttling).
-		const FADE_MS = 2200; // intro fade-in AND the calibration window
+		// never back up, so the field never pulses. frameEMA smooths the real
+		// inter-frame interval (≈ displayed FPS); slowAccum banks time spent over
+		// budget so a step needs sustained jank, not one spike. A step only trims
+		// particle count (which fades out smoothly) or framerate — never the canvas
+		// resolution — so adaptation is never a visible flash.
+		const FADE_MS = 1500; // intro fade-in
+		const GRACE_MS = 2800; // ignore startup churn before allowing any change
 		let frameEMA = 16.67;
 		let slowAccum = 0;
-		let locked = false;
 		let introStart = 0;
 		let introFade = reduced ? 1 : 0;
 		let scrollFade = 1;
@@ -431,13 +407,12 @@
 		function monitor(rawMs: number) {
 			const budget = TIERS[tier].renderEvery * 16.67;
 			if (frameEMA > budget * 1.4) slowAccum += rawMs;
-			else slowAccum *= 0.85; // occasional spikes bleed off; only sustained jank counts
-			const need = locked ? 5000 : 450; // ms of sustained jank before a step down
-			if (slowAccum > need && tier < TIERS.length - 1) {
+			else slowAccum *= 0.85; // transient spikes bleed off; only sustained jank counts
+			if (slowAccum > 1200 && tier < TIERS.length - 1) {
 				tier++;
 				slowAccum = 0;
 				frameEMA = TIERS[tier].renderEvery * 16.67; // neutral for the new budget
-				applyTier();
+				syncParticles(); // only the particle count changes — no resolution flash
 			}
 		}
 
@@ -474,18 +449,19 @@
 				retiringCount -= before - particles.length;
 			}
 
-			// Intro fade-in hides the startup calibration; lock the tier once it ends.
+			if (!introStart) introStart = now;
 			if (introFade < 1) {
-				if (!introStart) introStart = now;
 				introFade = Math.min(1, (now - introStart) / FADE_MS);
 				applyOpacity();
-				if (introFade >= 1) locked = true;
 			}
 
-			// Feed the one-way monitor. Ignore hidden-tab frames and huge gaps
-			// (GC pause, tab switch); clamp the EMA input so one spike can't dominate,
-			// but real jank (30–100ms+ frames) still registers as over-budget.
-			if (!document.hidden && rawMs < 1000) {
+			// Feed the one-way monitor, but only AFTER the grace period: page load,
+			// hydration, font/sprite work and the warmup all jank the first couple of
+			// seconds in a way that says nothing about steady-state GPU cost. Skipping
+			// them keeps capable machines permanently at full quality. Also ignore
+			// hidden-tab and huge-gap frames; clamp the EMA input so one spike can't
+			// dominate while real jank (30–100ms+ frames) still registers.
+			if (!document.hidden && rawMs < 1000 && now - introStart > GRACE_MS) {
 				frameEMA += (Math.min(rawMs, 100) - frameEMA) * 0.1;
 				monitor(rawMs);
 			}
