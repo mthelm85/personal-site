@@ -38,6 +38,15 @@ export function buildGraph() {
 		author: { '@id': PERSON_ID }
 	};
 
+	const page = {
+		'@type': 'ProfilePage',
+		'@id': SITE_URL,
+		url: SITE_URL,
+		name: 'Matt Helm — Data Scientist',
+		isPartOf: { '@id': `${SITE_URL}#website` },
+		mainEntity: { '@id': PERSON_ID }
+	};
+
 	const projects = {
 		'@type': 'ItemList',
 		'@id': `${SITE_URL}#projects`,
@@ -50,11 +59,15 @@ export function buildGraph() {
 				name: p.title,
 				description: p.description,
 				keywords: p.tech.join(', '),
-				...(p.github ? { codeRepository: p.github } : {}),
-				...(p.link ? { url: p.link } : {}),
-				...(p.tech.some((t) => LANGUAGES.has(t))
-					? { programmingLanguage: p.tech.filter((t) => LANGUAGES.has(t)) }
+				...(p.github
+					? {
+							codeRepository: p.github,
+							...(p.tech.some((t) => LANGUAGES.has(t))
+								? { programmingLanguage: p.tech.filter((t) => LANGUAGES.has(t)) }
+								: {})
+						}
 					: {}),
+				...(p.link ? { url: p.link } : {}),
 				author: { '@id': PERSON_ID }
 			}
 		}))
@@ -62,7 +75,7 @@ export function buildGraph() {
 
 	return {
 		'@context': 'https://schema.org',
-		'@graph': [person, website, projects]
+		'@graph': [person, website, page, projects]
 	};
 }
 
