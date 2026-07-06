@@ -384,9 +384,13 @@
 		let resizePending = false;
 		let last = performance.now();
 		let tick = 0;
-		// Runtime performance monitor. frameEMA is a smoothed measure of how long
-		// the render work takes; slow/fastAccum bank wall-clock time spent over or
-		// under budget so a tier change needs sustained evidence, not one spike.
+		// Runtime performance monitor. frameEMA is a smoothed measure of the actual
+		// wall-clock interval between rendered frames — i.e. displayed FPS. We time
+		// the interval, NOT the JS work, because canvas 2D draw calls are deferred:
+		// they queue and return in microseconds while the GPU rasterizes later, so
+		// work-time timing is blind to fill-rate jank on weak integrated GPUs.
+		// slow/fastAccum bank time spent over or under budget so a tier change needs
+		// sustained evidence, not one spike.
 		let frameEMA = 16.67;
 		let slowAccum = 0;
 		let fastAccum = 0;
@@ -396,10 +400,11 @@
 
 		function monitor(now: number, rawMs: number) {
 			const budget = TIERS[tier].renderEvery * 16.67;
-			if (frameEMA > budget * 0.85) {
+			// > ~43fps-equiv over budget → losing frames; comfortably under → headroom.
+			if (frameEMA > budget * 1.4) {
 				slowAccum += rawMs;
 				fastAccum = 0;
-			} else if (frameEMA < budget * 0.45) {
+			} else if (frameEMA < budget * 1.15) {
 				fastAccum += rawMs;
 				slowAccum = 0;
 			} else {
@@ -414,13 +419,13 @@
 				tier++;
 				downAt = now;
 				slowAccum = fastAccum = 0;
-				frameEMA = TIERS[tier].renderEvery * 16.67 * 0.5;
+				frameEMA = TIERS[tier].renderEvery * 16.67; // neutral: neither slow nor fast
 				applyTier();
 			} else if (fastAccum > 4000 && tier > tierFloor && now - downAt > 10000) {
 				tier--;
 				upAt = now;
 				slowAccum = fastAccum = 0;
-				frameEMA = TIERS[tier].renderEvery * 16.67 * 0.5;
+				frameEMA = TIERS[tier].renderEvery * 16.67; // neutral: neither slow nor fast
 				applyTier();
 			}
 		}
@@ -443,17 +448,20 @@
 			userW += (uTarget - userW) * 0.05 * dt;
 			if (userW < 0.0005) userW = uTarget === 0 ? 0 : userW;
 
-			const workStart = performance.now();
 			ctx.fillStyle = COLORS.trail;
 			ctx.fillRect(0, 0, W, H);
 			for (const p of particles) {
 				update(p, dt);
 				draw(p);
 			}
-			// Measure only the render work — immune to rAF throttling in background
-			// tabs — and feed it to the tier monitor.
-			frameEMA += (performance.now() - workStart - frameEMA) * 0.06;
-			monitor(now, rawMs);
+			// Feed the tier monitor the real inter-frame interval, but ignore frames
+			// that don't reflect steady-state rendering cost: a hidden tab (rAF is
+			// throttled) or an outlier gap (GC pause, tab switch, the warmup that runs
+			// inside resize) — otherwise those would trigger false demotions.
+			if (!document.hidden && rawMs < 200) {
+				frameEMA += (rawMs - frameEMA) * 0.06;
+				monitor(now, rawMs);
+			}
 		}
 
 		let resizeTimer: ReturnType<typeof setTimeout>;
