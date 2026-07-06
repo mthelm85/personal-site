@@ -137,7 +137,7 @@
 		let instBuf!: WebGLBuffer;
 		let partVao!: WebGLVertexArrayObject;
 		let fadeVao!: WebGLVertexArrayObject;
-		let atlasTex!: WebGLTexture;
+		let atlasTex: WebGLTexture | null = null;
 		let uResLoc: WebGLUniformLocation | null;
 		let uRampLoLoc: WebGLUniformLocation | null;
 		let uRampHiLoc: WebGLUniformLocation | null;
@@ -175,7 +175,10 @@
 
 		function buildAtlas() {
 			// Digits 0-9 baked white into a 10-cell strip; the shader tints them.
-			const cell = 64;
+			// Bake at the largest on-screen glyph's DEVICE size so the GPU barely has
+			// to minify it — minifying a big glyph down to ~10px thins the strokes
+			// (they look skinnier). Rebuilt on resize since the size tracks the screen.
+			const cell = Math.max(16, Math.round(SIZES[SIZES.length - 1] * sizeFactor * 1.5 * dpr));
 			const off = document.createElement('canvas');
 			off.width = cell * 10;
 			off.height = cell;
@@ -219,6 +222,7 @@
 			});
 			if (!g) return false;
 			gl = g;
+			atlasTex = null; // fresh context (incl. after loss) — force a rebuild
 
 			partProg = createProgram(PART_VS, PART_FS);
 			fadeProg = createProgram(FADE_VS, FADE_FS);
@@ -268,8 +272,8 @@
 			gl.vertexAttribPointer(0, 2, gl.FLOAT, false, 0, 0);
 			gl.bindVertexArray(null);
 
-			buildAtlas();
-			// Re-bake once the web font loads, in case it wasn't ready at startup.
+			// The atlas is (re)built in resize(), which runs right after this. Re-bake
+			// once the web font loads too, in case it wasn't ready at startup.
 			document.fonts?.ready.then(() => {
 				if (gl && !gl.isContextLost()) buildAtlas();
 			});
@@ -294,7 +298,7 @@
 
 		function glParticles() {
 			const n = particles.length;
-			if (n === 0) return;
+			if (n === 0 || !atlasTex) return;
 			let o = 0;
 			for (let i = 0; i < n; i++) {
 				const p = particles[i];
@@ -504,6 +508,7 @@
 			canvas.height = H * dpr;
 			gl.viewport(0, 0, canvas.width, canvas.height);
 			computeSizeFactor();
+			buildAtlas(); // re-bake digits at the screen-appropriate resolution
 			buildMask();
 			const target = particleTarget();
 			particles = [];
