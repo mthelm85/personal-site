@@ -1,1 +1,0 @@
-import{_ as s}from"./DOg4kPoS.js";async function m(o){try{const e=(await s(()=>import("./CtRa2BpX.js"),[],import.meta.url)).compile(o),t=(a,n)=>{const c={x:a,y:n},r=e.evaluate(c);return typeof r=="number"?r:0};return t(.5,.5),{ok:!0,fn:t}}catch{return{ok:!1,errorAt:0}}}export{m as parseEquation};
