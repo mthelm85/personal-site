@@ -12,7 +12,7 @@ export const TIMELINE: TimelineEntry[] = [
 		title: 'Data Scientist (Detail)',
 		organization: "U.S. Department of Labor, Chief Data & Analytics Office",
 		description:
-			'Leading the development of a department-wide data science and analytics platform as well as an MCP server to bridge AI systems with public federal labor data, enabling natural-language access to government datasets.',
+			'Leading the development of a department-wide data science and analytics platform, a unified, machine-readable data ecosystem for education and labor via RDF and semantic web technologies, and an MCP server to bridge AI systems with public federal labor data, enabling natural-language access to government datasets.',
 		type: 'work'
 	},
 	{
@@ -20,7 +20,7 @@ export const TIMELINE: TimelineEntry[] = [
 		title: 'Staff Data Scientist',
 		organization: 'U.S. Department of Labor, Wage & Hour Division',
 		description:
-			'Architect and deploy production-grade tools across the full data pipeline — from document retrieval systems in Rust (approved for DOL\'s Certified Software List) to constrained optimization models in JuMP.jl for national labor-allocation problems. Built LLM-powered agents using the Model Context Protocol (MCP) to interface with internal databases for real-time policy insights. Principal analyst for prevailing wage coverage estimation, causal inference studies, and Monte Carlo performance models.',
+			'Architect and deploy production-grade tools across the full data pipeline — from document retrieval systems in Rust (approved for DOL\'s Certified Software List) to constrained optimization models in JuMP.jl for national labor-allocation problems. Design and execute causal inference studies, Monte Carlo performance models, predictive models, time series modeling, and much more.',
 		type: 'work'
 	},
 	{
@@ -28,7 +28,7 @@ export const TIMELINE: TimelineEntry[] = [
 		title: 'M.S. Finance / Economics',
 		organization: 'West Texas A&M University',
 		description:
-			'Summa Cum Laude · GPA 4.0. Focused on econometric methods and quantitative finance. Developed the analytical foundation for later work in causal inference, optimization, and time series modeling.',
+			'Summa Cum Laude · GPA 4.0. Focused on econometric methods and quantitative finance.',
 		type: 'education'
 	},
 	{

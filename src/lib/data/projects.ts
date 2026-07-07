@@ -8,11 +8,11 @@ export interface Project {
 
 export const PROJECTS: Project[] = [
 	{
-		title: 'PlutoDataTable.jl',
+		title: 'RDF.jl',
 		description:
-			'An interactive, sortable data-table component for the Pluto.jl reactive notebook ecosystem.',
-		tech: ['Julia', 'Pluto.jl', 'HypertextLiteral.jl'],
-		github: 'https://github.com/mthelm85/PlutoDataTable.jl'
+			'A full-featured RDF 1.2 library for Julia with a conformant SPARQL 1.1 and 1.2 engine',
+		tech: ['Julia', 'RDF', 'SPARQL'],
+		github: 'https://github.com/mthelm85/RDF.jl'
 	},
 	{
 		title: 'CheckMate.jl',
