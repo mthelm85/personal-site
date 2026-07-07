@@ -22,7 +22,7 @@
 	// by a screen-size factor (see sizeFactor) so "Matt Helm" stays legible on
 	// small screens and reads comfortably on large ones.
 	const SIZES = [6, 8, 10];
-	const MAX_PARTICLES = 5000;
+	const MAX_PARTICLES = 8000;
 
 	// The field renders with WebGL2 instanced rendering: every digit is one
 	// instance of a single quad, so the whole field is ONE draw call per frame

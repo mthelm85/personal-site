@@ -36,7 +36,7 @@ export const TIMELINE: TimelineEntry[] = [
 		title: 'B.S. Economics',
 		organization: 'University of West Florida',
 		description:
-			'Cum Laude · GPA 3.6. Undergraduate degree in Economics with a focus on quantitative methods and econometrics. First encounter with regression, which proved consequential.',
+			'Cum Laude · GPA 3.6. Undergraduate degree in Economics with a focus on quantitative methods and econometrics.',
 		type: 'education'
 	}
 ];
