@@ -569,7 +569,12 @@
 			if (now - last < 16.67 - 3) return;
 
 			let dt = (now - last) / 16.67;
-			if (dt > 3) dt = 3;
+			// Cap advance-per-frame tighter than strict frame-rate independence: when
+			// frames are slow (e.g. during page load), a big jump would smear digits
+			// into streaks. Clamping to 1.5 keeps jumps small — the field runs in mild
+			// slow-motion through the jank instead of streaking — and never triggers at
+			// 60fps (dt≈1), so the steady-state look is unchanged.
+			if (dt > 1.5) dt = 1.5;
 			last = now;
 			t += 0.016 * dt;
 			const uTarget = userFn ? 1 : 0;
