@@ -8,6 +8,13 @@ export interface Project {
 
 export const PROJECTS: Project[] = [
 	{
+		title: 'Knowledge Graph Embeddings for Occupational Mobility',
+		description:
+			'Finding career pathways in O*NET data that traditional similarity methods cannot.',
+		tech: ['Julia', 'KGE', 'Lux.jl', 'CUDA'],
+		link: 'https://mthelm85.github.io/onet-occ-mobility/'
+	},
+	{
 		title: 'RDF.jl',
 		description:
 			'A full-featured RDF 1.2 library for Julia with a conformant SPARQL 1.1 and 1.2 engine',
@@ -93,12 +100,5 @@ export const PROJECTS: Project[] = [
 			'Julia package for pulling BLS economic data based on custom geospatial shapes. Draw a region, get the data.',
 		tech: ['Julia', 'BLS API', 'Geospatial'],
 		github: 'https://github.com/mthelm85/TerraStat.jl'
-	},
-	{
-		title: 'Fuzzy Joiner',
-		description:
-			'Perform fuzzy joins on two tables. The larger data set builds a Burkhard-Keller tree for efficient nearest neighbor searches using the Levenshtein edit distance. Core engine written in Rust, compiled to WebAssembly.',
-		tech: ['Vue.js', 'Vuetify', 'Rust', 'WebAssembly'],
-		link: 'https://fuzzy-joiner.vercel.app/'
 	}
 ];
