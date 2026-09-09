@@ -76,16 +76,10 @@ export const PROJECTS: Project[] = [
 		link: 'https://www.matthelm.pro/calculusStatic.html'
 	},
 	{
-		title: 'Linear Algebra Part I',
-		description: 'Learn about vectors and scalars.',
-		tech: ['Julia', 'Pluto.jl', 'Education'],
-		link: 'https://www.matthelm.pro/linAlgStatic.html'
-	},
-	{
-		title: 'Linear Algebra Part II',
-		description: 'Learn about matrices.',
-		tech: ['Julia', 'Pluto.jl', 'Education'],
-		link: 'https://www.matthelm.pro/linAlg2Static.html'
+		title: 'Linear Algebra',
+		description: 'A crash course in linear algebra.',
+		tech: ['JavaScript', 'Observable Framework', 'Education'],
+		link: 'https://mthelm85.github.io/linear-algebra/'
 	},
 	{
 		title: 'The Travelling Salesman Game',
