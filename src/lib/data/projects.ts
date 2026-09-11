@@ -62,24 +62,24 @@ export const PROJECTS: Project[] = [
 		link: 'https://featured.plutojl.org/puzzles-games/optimal%20meatballs'
 	},
 	{
-		title: 'County Clustering',
-		description:
-			'Clusters U.S. counties within a state according to industrial similarities using k-medoids and fuzzy c-means clustering algorithms.',
-		tech: ['Julia', 'Pluto.jl', 'Clustering'],
-		link: 'https://www.matthelm.pro/clusteringStatic.html'
-	},
-	{
 		title: 'Calculus',
 		description:
 			'An interactive notebook that clearly demonstrates the fundamental concepts of calculus. Learn and understand limits, continuity, derivatives and integrals in 30 minutes or less.',
-		tech: ['Julia', 'Pluto.jl', 'Education'],
-		link: 'https://www.matthelm.pro/calculusStatic.html'
+		tech: ['JavaScript', 'Observable Framework', 'Education'],
+		link: 'https://mthelm85.github.io/calculus/'
 	},
 	{
 		title: 'Linear Algebra',
 		description: 'A crash course in linear algebra.',
 		tech: ['JavaScript', 'Observable Framework', 'Education'],
 		link: 'https://mthelm85.github.io/linear-algebra/'
+	},
+	{
+		title: 'County Clustering',
+		description:
+			'Clusters U.S. counties within a state according to industrial similarities using k-medoids and fuzzy c-means clustering algorithms.',
+		tech: ['Julia', 'Pluto.jl', 'Clustering'],
+		link: 'https://www.matthelm.pro/clusteringStatic.html'
 	},
 	{
 		title: 'The Travelling Salesman Game',
