@@ -120,7 +120,7 @@
 
 			<div class="repl-hint">
 				{#if error}
-					<span style="color: #c09080;">Invalid expression — check syntax</span>
+					<span style="color: var(--color-error);">Invalid expression — check syntax</span>
 				{:else if inputVal}
 					→ Any math expression: f(x, y) = ...
 				{:else}
@@ -133,6 +133,6 @@
 
 <style>
 	.repl-input.error {
-		color: #c09080;
+		color: var(--color-error);
 	}
 </style>

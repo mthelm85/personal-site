@@ -48,8 +48,8 @@
 	}
 
 	.contact-intro {
-		font-family: 'MattHelm', Georgia, serif;
-		font-size: 1.5rem;
+		font-family: var(--font-body);
+		font-size: 1.15rem;
 		color: var(--color-text-secondary);
 		line-height: 1.75;
 		margin: 34px 0 55px;
@@ -75,13 +75,15 @@
 	}
 
 	.contact-link-label {
+		font-family: var(--font-label);
 		font-size: 12px;
 		color: var(--color-text-secondary);
 	}
 
 	.contact-link-value {
-		font-family: 'MattHelm', Georgia, serif;
+		font-family: var(--font-display);
 		font-size: 1.3rem;
+		font-weight: 800;
 		color: var(--color-accent);
 		transition: color 0.2s;
 	}

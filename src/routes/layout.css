@@ -1,5 +1,10 @@
 @import 'tailwindcss';
 @import 'katex/dist/katex.min.css';
+/* Self-hosted fonts (Fontsource), bundled by Vite */
+@import '@fontsource/turret-road/800.css';
+@import '@fontsource-variable/saira/wght.css';
+@import '@fontsource-variable/saira/wght-italic.css';
+@import '@fontsource/share-tech-mono/400.css';
 
 /* ─── Custom Fonts ─────────────────────────────────────────── */
 @font-face {
@@ -10,43 +15,69 @@
 }
 
 /* ─── Design Tokens ─────────────────────────────────────────── */
+/* Material Design 3 scheme from seed #6a68a0 (HCT 287.5 / 35.1 / 46.3),
+   generated with MaterialDesignColors.jl. Role names in comments;
+   "P<n>" is tone n of the primary tonal palette. */
 :root {
 	/* Dark mode (default) */
 	color-scheme: dark;
-	--color-bg: #08080f;
-	--color-bg-rgb: 8, 8, 15;
-	--color-surface: #0e0e1a;
-	--color-border: #1a1a2e;
-	--color-border-light: #2a2848;
+	--color-bg: #131316; /* surface */
+	--color-bg-rgb: 19, 19, 22;
+	--color-surface: #201f23; /* surface_container */
+	--color-border: #47464f; /* outline_variant */
+	--color-border-light: #928f99; /* outline */
 
-	--color-text-primary: #d4d0c8;
-	--color-text-secondary: #9a98b0;
-	--color-text-tertiary: #9a98b0;
+	--color-text-primary: #e5e1e6; /* on_surface */
+	--color-text-secondary: #c8c5d0; /* on_surface_variant */
+	--color-text-tertiary: #c8c5d0;
 
-	--color-accent: #6a68a0;
-	--color-accent-hi: #8886c0;
-	--color-accent-warm: #b08860;
+	--color-accent: #a8a5e2; /* P70 */
+	--color-accent-hi: #c3c0ff; /* primary */
+	--color-accent-warm: #eab9d1; /* tertiary */
+	--color-accent-container: #434176; /* primary_container */
+	--color-on-accent-container: #e3dfff; /* on_primary_container */
+	--color-error: #ffb4ab; /* error */
 
+	/* Flow-field digit ramp */
+	--color-flow-lo: #5a598f; /* P40 */
+	--color-flow-hi: #d3d0ff; /* P85 */
 }
 
 /* Light mode */
 @media (prefers-color-scheme: light) {
 	:root {
 		color-scheme: light;
-		--color-bg: #fafaf8;
-		--color-bg-rgb: 250, 250, 248;
-		--color-surface: #f5f5f3;
-		--color-border: #e0e0da;
-		--color-border-light: #d5d5cf;
+		--color-bg: #fcf8fd; /* surface */
+		--color-bg-rgb: 252, 248, 253;
+		--color-surface: #f1edf1; /* surface_container */
+		--color-border: #c8c5d0; /* outline_variant */
+		--color-border-light: #787680; /* outline */
 
-		--color-text-primary: #1a1a1f;
-		--color-text-secondary: #5a5a6a;
-		--color-text-tertiary: #5a5a6a;
+		--color-text-primary: #1c1b1f; /* on_surface */
+		--color-text-secondary: #47464f; /* on_surface_variant */
+		--color-text-tertiary: #47464f;
 
-		--color-accent: #7a78b0;
-		--color-accent-hi: #6a68a0;
-		--color-accent-warm: #a07850;
+		--color-accent: #434176; /* P30 */
+		--color-accent-hi: #5a598f; /* primary */
+		--color-accent-warm: #7a5368; /* tertiary */
+		--color-accent-container: #e3dfff; /* primary_container */
+		--color-on-accent-container: #161448; /* on_primary_container */
+		--color-error: #b91b1b; /* error */
+
+		--color-flow-lo: #a8a5e2; /* P70 */
+		--color-flow-hi: #2c2a5e; /* P20 */
 	}
+}
+
+/* ─── Typography ────────────────────────────────────────────── */
+/* "Outrun": 80s synthwave.
+   display — Turret Road: segmented retro-futurist caps-feel, 700/800
+   body    — Saira: squared 80s-tech sans, variable 300–700
+   label   — Share Tech Mono: OCR-ish terminal mono (nav, meta, code, flow digits) */
+:root {
+	--font-display: 'Turret Road', sans-serif;
+	--font-body: 'Saira Variable', system-ui, sans-serif;
+	--font-label: 'Share Tech Mono', ui-monospace, monospace;
 }
 
 /* ─── Base Styles ─────────────────────────────────────────────── */
@@ -64,7 +95,8 @@ html {
 body {
 	background-color: var(--color-bg);
 	color: var(--color-text-primary);
-	font-family: 'MattHelm', Georgia, serif;
+	font-family: var(--font-body);
+	font-weight: 300;
 	line-height: 1.7;
 	min-height: 100vh;
 	overflow-x: hidden;
@@ -77,10 +109,10 @@ body {
 	left: 8px;
 	z-index: 9999;
 	padding: 8px 16px;
-	background: var(--color-accent);
-	color: var(--color-text-primary);
-	font-family: 'MattHelm', Georgia, serif;
-	font-size: 14px;
+	background: var(--color-accent-container);
+	color: var(--color-on-accent-container);
+	font-family: var(--font-label);
+	font-size: 12px;
 	text-decoration: none;
 	border-radius: 4px;
 	transition: top 0.2s;
@@ -91,18 +123,18 @@ body {
 
 /* Section headings */
 .section-heading {
-	font-family: 'MattHelm', Georgia, serif;
+	font-family: var(--font-display);
 	font-size: clamp(2rem, 4vw, 3rem);
-	font-weight: 500;
-	letter-spacing: -0.01em;
+	font-weight: 800;
+	letter-spacing: 0.02em;
 	color: var(--color-text-primary);
 	line-height: 1.2;
 }
 
 /* Mono label style */
 .mono-label {
-	font-family: 'MattHelm', Georgia, serif;
-	font-size: 18px;
+	font-family: var(--font-label);
+	font-size: 13px;
 	letter-spacing: 0.06em;
 	text-transform: uppercase;
 	color: var(--color-text-secondary);
@@ -110,8 +142,8 @@ body {
 
 /* ─── Navigation ───────────────────────────────────────────────── */
 nav a {
-	font-family: 'MattHelm', Georgia, serif;
-	font-size: 18px;
+	font-family: var(--font-label);
+	font-size: 13px;
 	letter-spacing: 0.06em;
 	text-transform: uppercase;
 	color: var(--color-text-secondary);
@@ -138,8 +170,8 @@ nav a.active {
 }
 
 .equation-display {
-	font-family: 'MattHelm', Georgia, serif;
-	font-size: 13px;
+	font-family: var(--font-label);
+	font-size: 12px;
 	color: var(--color-text-secondary);
 	cursor: pointer;
 	transition: color 0.3s;
@@ -204,8 +236,8 @@ nav a.active {
 }
 
 .repl-header .label {
-	font-family: 'MattHelm', Georgia, serif;
-	font-size: 20px;
+	font-family: var(--font-label);
+	font-size: 14px;
 	letter-spacing: 0.06em;
 	text-transform: uppercase;
 	color: var(--color-text-secondary);
@@ -213,8 +245,8 @@ nav a.active {
 }
 
 .repl-header .label-sub {
-	font-family: 'MattHelm', Georgia, serif;
-	font-size: 18px;
+	font-family: var(--font-body);
+	font-size: 15px;
 	color: var(--color-text-secondary);
 	font-style: italic;
 	display: block;
@@ -229,7 +261,7 @@ nav a.active {
 	background: transparent;
 	border: none;
 	outline: none;
-	font-family: 'JetBrains Mono', monospace;
+	font-family: var(--font-label);
 	font-size: 24px;
 	color: var(--color-accent-hi);
 	caret-color: var(--color-accent-hi);
@@ -241,8 +273,8 @@ nav a.active {
 
 .repl-hint {
 	padding: 8px 16px 12px;
-	font-family: 'MattHelm', Georgia, serif;
-	font-size: 17px;
+	font-family: var(--font-body);
+	font-size: 14px;
 	color: var(--color-text-secondary);
 	border-top: 1px solid var(--color-border-light);
 }
@@ -265,14 +297,16 @@ nav a.active {
 }
 
 .project-card h3 {
-	font-family: 'MattHelm', Georgia, serif;
-	font-size: 1.35rem;
+	font-family: var(--font-display);
+	font-size: 1.3rem;
+	font-weight: 800;
+	line-height: 1.25;
 	color: var(--color-text-primary);
 	margin: 0 0 8px;
 }
 
 .project-card p {
-	font-size: 1.3rem;
+	font-size: 0.95rem;
 	color: var(--color-text-secondary);
 	margin: 0 0 13px;
 	line-height: 1.5;
@@ -284,8 +318,8 @@ nav a.active {
 	background: var(--color-surface);
 	border: 1px solid var(--color-accent);
 	border-radius: 2px;
-	font-family: 'MattHelm', Georgia, serif;
-	font-size: 18px;
+	font-family: var(--font-label);
+	font-size: 12px;
 	color: var(--color-text-secondary);
 	margin: 0 4px 4px 0;
 }
@@ -332,9 +366,8 @@ a:hover {
 
 /* ─── Selection ────────────────────────────────────────────────── */
 ::selection {
-	background: var(--color-accent);
-	opacity: 0.25;
-	color: var(--color-text-primary);
+	background: var(--color-accent-container);
+	color: var(--color-on-accent-container);
 }
 
 /* ─── Scrollbar ────────────────────────────────────────────────── */
@@ -374,7 +407,7 @@ a:hover {
 	}
 
 	.tech-tag {
-		font-size: 16px;
+		font-size: 11px;
 		padding: 5px 14px;
 	}
 }

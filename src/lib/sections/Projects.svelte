@@ -31,8 +31,8 @@
 	}
 
 	.section-intro {
-		font-family: 'MattHelm', Georgia, serif;
-		font-size: 1.2rem;
+		font-family: var(--font-body);
+		font-size: 1.05rem;
 		color: var(--color-text-secondary);
 		margin: 21px 0 55px;
 		font-style: italic;

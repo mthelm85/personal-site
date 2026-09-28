@@ -107,25 +107,25 @@
 		// colour ramp endpoints (pale-on-dark or ink-on-light), all as 0..1 floats.
 		function glTheme() {
 			const light = lightMq.matches;
-			let bg = getComputedStyle(document.documentElement).getPropertyValue('--color-bg').trim();
-			if (!/^#[0-9a-fA-F]{6}$/.test(bg)) bg = light ? '#fafaf8' : '#08080f';
-			const br = parseInt(bg.slice(1, 3), 16);
-			const bgn = parseInt(bg.slice(3, 5), 16);
-			const bb = parseInt(bg.slice(5, 7), 16);
-			const ramp = (k: number): [number, number, number, number] =>
-				light
-					? [140 - k * 105, 148 - k * 78, 168 - k * 43, 0.3 + k * 0.45]
-					: [100 + k * 60, 122 + k * 70, 150 + k * 65, 0.28 + k * 0.38];
-			const lo = ramp(0);
-			const hi = ramp(1);
+			const css = getComputedStyle(document.documentElement);
+			const hexVar = (name: string, fallback: string) => {
+				const v = css.getPropertyValue(name).trim();
+				return /^#[0-9a-fA-F]{6}$/.test(v) ? v : fallback;
+			};
+			const rgb = (hex: string): [number, number, number] => [
+				parseInt(hex.slice(1, 3), 16) / 255,
+				parseInt(hex.slice(3, 5), 16) / 255,
+				parseInt(hex.slice(5, 7), 16) / 255
+			];
+			const bg = hexVar('--color-bg', light ? '#fcf8fd' : '#131316');
 			return {
 				bgHex: bg,
-				bg: [br / 255, bgn / 255, bb / 255] as [number, number, number],
+				bg: rgb(bg),
 				trailA: 0.32,
-				rampLo: [lo[0] / 255, lo[1] / 255, lo[2] / 255] as [number, number, number],
-				aLo: lo[3],
-				rampHi: [hi[0] / 255, hi[1] / 255, hi[2] / 255] as [number, number, number],
-				aHi: hi[3]
+				rampLo: rgb(hexVar('--color-flow-lo', light ? '#a8a5e2' : '#5a598f')),
+				aLo: light ? 0.3 : 0.28,
+				rampHi: rgb(hexVar('--color-flow-hi', light ? '#2c2a5e' : '#d3d0ff')),
+				aHi: light ? 0.75 : 0.66
 			};
 		}
 
@@ -185,7 +185,7 @@
 			const octx = off.getContext('2d')!;
 			octx.clearRect(0, 0, off.width, off.height);
 			octx.fillStyle = '#fff';
-			octx.font = `400 ${Math.round(cell * 0.7)}px 'JetBrains Mono', Consolas, monospace`;
+			octx.font = `400 ${Math.round(cell * 0.7)}px 'Share Tech Mono', monospace`;
 			octx.textAlign = 'center';
 			octx.textBaseline = 'middle';
 			for (let d = 0; d < 10; d++) octx.fillText(String(d), d * cell + cell / 2, cell / 2);
@@ -647,6 +647,12 @@
 		window.addEventListener('scroll', onScroll, { passive: true });
 		canvas.style.backgroundColor = bgHex;
 		resize();
+		// Canvas text silently falls back if a web font is not loaded yet; rebake
+		// the digit atlas once the real font arrives. The name mask stays on a
+		// heavy system face: it has to be thick for the digits to read as letters.
+		document.fonts.load('400 100px "Share Tech Mono"').then(() => {
+			if (gl && !gl.isContextLost()) resize();
+		});
 		onScroll();
 		if (!reduced) {
 			last = performance.now();

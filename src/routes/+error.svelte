@@ -85,6 +85,7 @@
 	}
 
 	.error-code {
+		font-family: var(--font-label);
 		font-size: 13px;
 		color: var(--color-text-secondary);
 		margin-bottom: 13px;
@@ -92,24 +93,24 @@
 	}
 
 	h1 {
-		font-family: 'MattHelm', Georgia, serif;
-		font-size: clamp(2rem, 5vw, 3.5rem);
+		font-family: var(--font-display);
+		font-size: clamp(1.5rem, 4vw, 2.4rem);
 		font-weight: 500;
 		color: var(--color-text-primary);
 		margin: 0 0 13px;
 	}
 
 	.theorem-statement {
-		font-family: 'MattHelm', Georgia, serif;
-		font-size: 1.55rem;
+		font-family: var(--font-body);
+		font-size: 1.2rem;
 		color: var(--color-text-secondary);
 		margin: 0 0 55px;
 		font-style: italic;
 	}
 
 	.proof-body {
-		font-family: 'MattHelm', Georgia, serif;
-		font-size: 1.45rem;
+		font-family: var(--font-body);
+		font-size: 1.05rem;
 		line-height: 1.8;
 	}
 
@@ -163,8 +164,8 @@
 		display: flex;
 		gap: 13px;
 		align-items: center;
-		font-family: 'MattHelm', Georgia, serif;
-		font-size: 13px;
+		font-family: var(--font-label);
+		font-size: 12px;
 		color: var(--color-text-secondary);
 	}
 

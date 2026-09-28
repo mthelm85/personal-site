@@ -60,8 +60,8 @@
 	}
 
 	.nav-link {
-		font-family: 'MattHelm', Georgia, serif;
-		font-size: 18px;
+		font-family: var(--font-label);
+		font-size: 13px;
 		letter-spacing: 0.06em;
 		text-transform: uppercase;
 		color: var(--color-text-secondary);
@@ -84,7 +84,7 @@
 			width: 100%;
 		}
 		.nav-link {
-			font-size: 12px;
+			font-size: 11px;
 			letter-spacing: 0.03em;
 		}
 	}

@@ -41,7 +41,7 @@
 	</div>
 
 	{#if project.github || project.link}
-		<div class="flex gap-4" style="font-family: 'MattHelm', Georgia, serif; font-size: 20px;">
+		<div class="flex gap-4" style="font-family: var(--font-label); font-size: 13px;">
 			{#if project.github}
 				<a href={project.github} target="_blank" rel="noopener noreferrer" style="color: var(--color-accent-hi);"
 					>GitHub →</a

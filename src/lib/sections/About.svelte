@@ -58,8 +58,8 @@
 	}
 
 	.about-prose p {
-		font-family: 'MattHelm', Georgia, serif;
-		font-size: 1.45rem;
+		font-family: var(--font-body);
+		font-size: 1.1rem;
 		line-height: 1.75;
 		color: var(--color-text-secondary);
 		margin: 0 0 1.4em;
@@ -85,8 +85,8 @@
 	}
 
 	.skill-item {
-		font-family: 'MattHelm', Georgia, serif;
-		font-size: 18px;
+		font-family: var(--font-label);
+		font-size: 13px;
 		color: var(--color-text-secondary);
 		padding: 6px 16px;
 		border: 1px solid var(--color-border-light);
@@ -106,14 +106,14 @@
 			padding: 55px 20px;
 		}
 		.about-prose p {
-			font-size: 1.3rem;
+			font-size: 1rem;
 		}
 		.skills-grid {
 			margin-top: 34px;
 			gap: 21px;
 		}
 		.skill-item {
-			font-size: 16px;
+			font-size: 12px;
 			padding: 5px 14px;
 		}
 	}

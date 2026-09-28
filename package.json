@@ -36,6 +36,9 @@
 		"vite": "^7.3.1"
 	},
 	"dependencies": {
+		"@fontsource-variable/saira": "^5.3.0",
+		"@fontsource/share-tech-mono": "^5.3.0",
+		"@fontsource/turret-road": "^5.3.0",
 		"katex": "^0.16.40",
 		"mathjs": "^15.1.1"
 	}

@@ -78,8 +78,8 @@
 	}
 
 	.timeline-year span {
-		font-family: 'MattHelm', Georgia, serif;
-		font-size: 18px;
+		font-family: var(--font-label);
+		font-size: 13px;
 		color: var(--color-text-secondary);
 		letter-spacing: 0.04em;
 		padding-right: 14px; /* clear the dot */
@@ -111,28 +111,29 @@
 	}
 
 	.timeline-type {
-		font-size: 16px;
+		font-size: 13px;
 	}
 
 	.timeline-title {
-		font-family: 'MattHelm', Georgia, serif;
-		font-size: 1.35rem;
-		font-weight: 500;
+		font-family: var(--font-display);
+		font-size: 1.3rem;
+		line-height: 1.25;
+		font-weight: 800;
 		color: var(--color-text-primary);
 		margin: 4px 0 4px;
 	}
 
 	.timeline-org {
-		font-family: 'MattHelm', Georgia, serif;
-		font-size: 18px;
+		font-family: var(--font-label);
+		font-size: 13px;
 		color: var(--color-text-secondary);
 		margin-bottom: 10px;
 		letter-spacing: 0.03em;
 	}
 
 	.timeline-desc {
-		font-family: 'MattHelm', Georgia, serif;
-		font-size: 1.3rem;
+		font-family: var(--font-body);
+		font-size: 1rem;
 		color: var(--color-text-secondary);
 		line-height: 1.6;
 		margin: 0;
