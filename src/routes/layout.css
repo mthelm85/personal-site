@@ -301,10 +301,10 @@ nav a.active {
 }
 
 /* ─── Project Cards ────────────────────────────────────────────── */
-/* MD3 outlined card: surface + outline_variant, medium (12px) shape.
+/* MD3-role card: surface_container fill + outline_variant border, 12px shape.
    The hover tilt (ProjectCard.svelte) is a deliberate signature effect. */
 .project-card {
-	background: var(--color-bg);
+	background: var(--color-surface);
 	border: 1px solid var(--color-border);
 	border-radius: 12px;
 	padding: 21px;
