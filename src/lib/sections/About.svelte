@@ -2,9 +2,9 @@
 	import { SKILLS, DOMAINS } from '$lib/data/identity';
 
 	const PARAGRAPHS = [
-		`For over ten years at the U.S. Department of Labor, I’ve bridged the gap between data science and federal policy. My work spans the full pipeline: from data engineering to analysis, modeling, and forecasting — all the way through to deployment.`,
-		`I specialize in architecting production-grade tools in Rust and Julia, building LLM-powered agents using the Model Context Protocol (MCP), and building models that answer real questions — like where the federal government should hire to best serve American workers.`,
-		`I'm especially interested in problems where computation and statistics meet real-world consequence — where a model doesn't just describe the world but shapes budgets, enforcement strategy, or policy.`,
+		`For over ten years at the U.S. Department of Labor, I’ve worked at the intersection of data science, software engineering, and federal policy. My work spans the full pipeline: from data engineering and analysis to statistical modeling, forecasting, and deployment.`,
+		`Put simply, I specialize in solving difficult problems. When a problem requires thinking outside the box, learning something new, or applying unfamiliar technologies and techniques, I draw on methods from statistics, mathematics, computing, and software engineering to build practical, actionable solutions.`,
+		`I’m particularly interested in problems where computation and statistical methods meet real-world consequences—where a model doesn’t simply describe the world, but helps shape decisions about budgets, strategies, and policy.`,
 	];
 </script>
 
