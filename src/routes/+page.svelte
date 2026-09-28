@@ -63,7 +63,12 @@
 		<span class="sep" aria-hidden="true">·</span>
 		<span class="term">builder</span>
 	</p>
-	<a class="scroll-hint" href="#about" aria-label="Scroll down">↓</a>
+	<a class="scroll-hint" href="#about" aria-label="Scroll down">
+		<!-- Material Symbols "expand_more" -->
+		<svg viewBox="0 -960 960 960" width="24" height="24" aria-hidden="true">
+			<path d="M480-345 240-585l56-56 184 184 184-184 56 56-240 240Z" fill="currentColor" />
+		</svg>
+	</a>
 </section>
 
 <div class="flow-space" aria-hidden="true"></div>
@@ -132,17 +137,44 @@
 		}
 	}
 
+	/* MD3 tonal icon button (medium, 56px) with a state layer */
 	.scroll-hint {
+		position: relative;
 		pointer-events: auto;
-		color: var(--color-text-secondary);
+		display: grid;
+		place-items: center;
+		width: 56px;
+		height: 56px;
+		border-radius: 50%;
+		background: var(--color-secondary-container);
+		color: var(--color-on-secondary-container);
 		text-decoration: none;
-		font-size: 18px;
 		margin-bottom: 21px;
 		animation: drift 2.4s ease-in-out infinite;
 	}
 
-	.scroll-hint:hover {
-		color: var(--color-text-primary);
+	.scroll-hint::before {
+		content: '';
+		position: absolute;
+		inset: 0;
+		border-radius: inherit;
+		background: currentColor;
+		opacity: 0;
+		transition: opacity 0.2s var(--ease-standard);
+	}
+
+	.scroll-hint:hover,
+	.scroll-hint:active {
+		color: var(--color-on-secondary-container);
+	}
+
+	.scroll-hint:hover::before {
+		opacity: 0.08;
+	}
+
+	.scroll-hint:focus-visible::before,
+	.scroll-hint:active::before {
+		opacity: 0.1;
 	}
 
 	@keyframes drift {
