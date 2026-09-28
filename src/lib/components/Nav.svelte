@@ -66,7 +66,7 @@
 		text-transform: uppercase;
 		color: var(--color-text-secondary);
 		text-decoration: none;
-		transition: color 0.2s;
+		transition: color 0.2s var(--ease-standard);
 	}
 	.nav-link:hover,
 	.nav-link.active {

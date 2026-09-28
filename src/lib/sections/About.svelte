@@ -23,7 +23,7 @@
 				<div class="mono-label" style="margin-bottom: 13px;">Languages & Tools</div>
 				<div class="skill-list">
 					{#each SKILLS as skill}
-						<span class="skill-item">{skill}</span>
+						<span class="chip">{skill}</span>
 					{/each}
 				</div>
 			</div>
@@ -32,7 +32,7 @@
 				<div class="mono-label" style="margin-bottom: 13px;">Domains</div>
 				<div class="skill-list">
 					{#each DOMAINS as domain}
-						<span class="skill-item">{domain}</span>
+						<span class="chip">{domain}</span>
 					{/each}
 				</div>
 			</div>
@@ -84,23 +84,6 @@
 		gap: 8px;
 	}
 
-	.skill-item {
-		font-family: var(--font-label);
-		font-size: 13px;
-		color: var(--color-text-secondary);
-		padding: 6px 16px;
-		border: 1px solid var(--color-border-light);
-		border-radius: 2px;
-		transition:
-			border-color 0.3s,
-			color 0.3s;
-	}
-
-	.skill-item:hover {
-		border-color: var(--color-accent);
-		color: var(--color-text-primary);
-	}
-
 	@media (max-width: 600px) {
 		.section {
 			padding: 55px 20px;
@@ -111,10 +94,6 @@
 		.skills-grid {
 			margin-top: 34px;
 			gap: 21px;
-		}
-		.skill-item {
-			font-size: 12px;
-			padding: 5px 14px;
 		}
 	}
 </style>

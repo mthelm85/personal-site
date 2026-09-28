@@ -34,9 +34,9 @@
 	<h3>{project.title}</h3>
 	<p>{project.description}</p>
 
-	<div class="flex flex-wrap gap-1 mb-3">
+	<div class="flex flex-wrap gap-2 mb-3">
 		{#each project.tech as tag}
-			<span class="tech-tag">{tag}</span>
+			<span class="chip">{tag}</span>
 		{/each}
 	</div>
 

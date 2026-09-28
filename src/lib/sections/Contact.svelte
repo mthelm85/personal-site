@@ -67,7 +67,7 @@
 		flex-direction: column;
 		gap: 4px;
 		text-decoration: none;
-		transition: transform 0.2s;
+		transition: transform 0.2s var(--ease-standard);
 	}
 
 	.contact-link:hover {
@@ -84,12 +84,12 @@
 		font-family: var(--font-display);
 		font-size: 1.3rem;
 		font-weight: 800;
-		color: var(--color-accent);
-		transition: color 0.2s;
+		color: var(--color-accent-hi);
+		transition: color 0.2s var(--ease-standard);
 	}
 
 	.contact-link:hover .contact-link-value {
-		color: var(--color-accent-hi);
+		color: var(--color-accent);
 	}
 
 	.site-footer {

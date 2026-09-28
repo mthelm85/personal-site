@@ -76,12 +76,12 @@
 		color: var(--color-text-secondary);
 		text-decoration: none;
 		margin-bottom: 55px;
-		transition: color 0.2s;
+		transition: color 0.2s var(--ease-standard);
 		font-size: 12px;
 	}
 
 	.back-link:hover {
-		color: var(--color-text-secondary);
+		color: var(--color-text-primary);
 	}
 
 	.error-code {
@@ -172,7 +172,7 @@
 	.links a {
 		color: var(--color-text-secondary);
 		text-decoration: none;
-		transition: color 0.2s;
+		transition: color 0.2s var(--ease-standard);
 	}
 
 	.links a:hover {

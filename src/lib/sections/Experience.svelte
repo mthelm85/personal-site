@@ -97,7 +97,7 @@
 
 	.timeline-dot.work {
 		background: var(--color-bg);
-		border-color: var(--color-accent);
+		border-color: var(--color-accent-hi); /* primary */
 	}
 
 	.timeline-dot.education {
