@@ -3,7 +3,9 @@
 	import favicon from '$lib/assets/favicon.ico';
 	import { onMount } from 'svelte';
 	import { browser } from '$app/environment';
+	import { get } from 'svelte/store';
 	import { replOpen } from '$lib/stores/repl';
+	import { activeSection } from '$lib/stores/scroll';
 
 	import Nav from '$lib/components/Nav.svelte';
 
@@ -20,7 +22,9 @@
 		if (!browser) return;
 
 		const handleKey = (e: KeyboardEvent) => {
-			if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+			// Not on the hero: the flow field ignores user functions there, so the
+			// REPL would appear broken (see EquationDisplay).
+			if ((e.metaKey || e.ctrlKey) && e.key === 'k' && get(activeSection) !== 'hero') {
 				e.preventDefault();
 				replOpen.update((v) => !v);
 			}
