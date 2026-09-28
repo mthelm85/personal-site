@@ -353,35 +353,6 @@ nav a.active {
 	color: var(--color-text-secondary); /* on_surface_variant */
 }
 
-/* ─── Timeline ─────────────────────────────────────────────────── */
-.timeline {
-	position: relative;
-}
-
-.timeline::before {
-	content: '';
-	position: absolute;
-	left: 50%;
-	top: 0;
-	bottom: 0;
-	width: 1px;
-	background: var(--color-border);
-	transform: translateX(-50%);
-}
-
-@media (max-width: 768px) {
-	.timeline::before {
-		left: 24px;
-	}
-}
-
-.timeline-entry {
-	display: flex;
-	align-items: flex-start;
-	margin-bottom: 55px;
-	position: relative;
-}
-
 /* ─── Global Link Styles ───────────────────────────────────────── */
 a {
 	color: var(--color-accent-hi);
@@ -441,6 +412,100 @@ a:hover {
 	}
 }
 
+/* ─── VHS glitch-out ───────────────────────────────────────────── */
+/* As a block scrolls out near the top of the viewport it breaks up like a
+   worn tape: the colour channels split (magenta/cyan text-shadow), scanlines
+   cut through it, tracking jitters it sideways, and it flickers out.
+   Scroll-driven, no JS. Gated on support: an unsupported browser would
+   otherwise apply the end frame (invisible) permanently. Don't put .bend on
+   an element that sets its own transform (the card tilt, hover slides): the
+   animation would override it — wrap that element instead.
+
+   The split and scanline strength are registered custom properties so the
+   keyframes can drive values inside text-shadow and the mask gradient. The
+   magenta/cyan are effect colours outside the MD3 roles, like the flow-field
+   digit ramp. */
+@property --glitch-split {
+	syntax: '<number>';
+	inherits: true;
+	initial-value: 0;
+}
+
+@property --glitch-scan {
+	syntax: '<number>';
+	inherits: false;
+	initial-value: 0;
+}
+
+@supports (animation-timeline: view()) {
+	/* The trigger line sits 32px from the top: a block starts glitching when
+	   its top crosses it, and is gone 160px of scroll later whatever its
+	   height. It is a fixed length, and above the section top padding (89px,
+	   55px on mobile), so a section heading that nav links scroll to the top
+	   lands clean instead of mid-glitch. */
+	.bend {
+		animation: vhs-out linear both;
+		animation-timeline: view(block 32px 0px);
+		animation-range: exit-crossing 0 exit-crossing 160px;
+		/* Shadow alpha ramps up with the split, so at rest (split 0) the
+		   zero-offset shadows can't tint the letter edges. */
+		text-shadow:
+			calc(var(--glitch-split) * -1px) 0 rgb(255 0 140 / calc(min(var(--glitch-split), 1) * 0.75)),
+			calc(var(--glitch-split) * 1px) 0 rgb(0 220 255 / calc(min(var(--glitch-split), 1) * 0.75));
+		mask-image: repeating-linear-gradient(
+			to bottom,
+			#000 0 2px,
+			rgb(0 0 0 / calc(1 - var(--glitch-scan))) 2px 4px
+		);
+	}
+
+	@keyframes vhs-out {
+		0% {
+			--glitch-split: 0;
+			--glitch-scan: 0;
+			transform: none;
+			opacity: 1;
+		}
+		30% {
+			--glitch-split: 2;
+			--glitch-scan: 0.35;
+			transform: none;
+		}
+		/* tracking jumps: sudden sideways tears, held briefly */
+		38% {
+			transform: translateX(-6px) skewX(-4deg);
+		}
+		44% {
+			transform: translateX(4px) skewX(2deg);
+			opacity: 0.9;
+		}
+		52% {
+			transform: none;
+			opacity: 0.45;
+		}
+		58% {
+			--glitch-split: 5;
+			transform: translateX(10px) skewX(6deg);
+			opacity: 0.85;
+		}
+		66% {
+			--glitch-scan: 0.8;
+			transform: translateX(-3px);
+			opacity: 0.2;
+		}
+		74% {
+			transform: translateX(14px) skewX(-8deg);
+			opacity: 0.6;
+		}
+		100% {
+			--glitch-split: 9;
+			--glitch-scan: 1;
+			transform: translateX(-20px) skewX(10deg);
+			opacity: 0;
+		}
+	}
+}
+
 /* ─── Reduced motion ───────────────────────────────────────────── */
 @media (prefers-reduced-motion: reduce) {
 	* {
@@ -450,6 +515,9 @@ a:hover {
 	.cursor {
 		animation: none !important;
 		opacity: 0.7 !important;
+	}
+	.bend {
+		animation: none !important;
 	}
 }
 

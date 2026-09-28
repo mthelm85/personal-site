@@ -4,11 +4,11 @@
 
 <section id="experience" class="section" aria-labelledby="experience-heading">
 	<div class="section-inner">
-		<h2 id="experience-heading" class="section-heading">Experience</h2>
+		<h2 id="experience-heading" class="section-heading bend">Experience</h2>
 
 		<div class="timeline" role="list">
 			{#each TIMELINE as entry, i}
-				<div class="timeline-entry" role="listitem">
+				<div class="timeline-entry bend" role="listitem">
 					<!-- Year marker -->
 					<div class="timeline-year" aria-hidden="true">
 						<span>{entry.year}</span>
@@ -49,7 +49,9 @@
 		position: relative;
 	}
 
-	.timeline::before {
+	/* The rail is drawn per entry (not once on .timeline) so each segment
+	   bends away with its entry. Padding, not margin, keeps it continuous. */
+	.timeline-entry::before {
 		content: '';
 		position: absolute;
 		left: 80px;
@@ -59,11 +61,15 @@
 		background: var(--color-border-light);
 	}
 
+	.timeline-entry:last-child::before {
+		bottom: 55px;
+	}
+
 	.timeline-entry {
 		display: grid;
 		grid-template-columns: 80px 1fr;
 		gap: 21px;
-		margin-bottom: 55px;
+		padding-bottom: 55px;
 		position: relative;
 		align-items: start;
 	}
@@ -143,13 +149,13 @@
 		.section {
 			padding: 55px 20px;
 		}
-		.timeline::before {
+		.timeline-entry::before {
 			display: none;
 		}
 		.timeline-entry {
 			grid-template-columns: 1fr;
 			gap: 8px;
-			margin-bottom: 34px;
+			padding-bottom: 34px;
 		}
 		.timeline-year {
 			flex-direction: row;

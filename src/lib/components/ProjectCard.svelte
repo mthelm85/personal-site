@@ -25,6 +25,8 @@
 	}
 </script>
 
+<!-- The wrapper carries the scroll bend; the article keeps its own tilt transform. -->
+<div class="card-slot bend">
 <article
 	bind:this={card}
 	class="project-card"
@@ -55,3 +57,14 @@
 		</div>
 	{/if}
 </article>
+</div>
+
+<style>
+	/* Keep cards in a grid row equal height through the wrapper */
+	.card-slot {
+		display: flex;
+	}
+	.card-slot > .project-card {
+		flex: 1;
+	}
+</style>

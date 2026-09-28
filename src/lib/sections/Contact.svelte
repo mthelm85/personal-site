@@ -3,13 +3,13 @@
 
 <section id="contact" class="section" aria-labelledby="contact-heading">
 	<div class="section-inner">
-		<h2 id="contact-heading" class="section-heading">Contact</h2>
+		<h2 id="contact-heading" class="section-heading bend">Contact</h2>
 
-		<p class="contact-intro">
+		<p class="contact-intro bend">
 			If something here piques your interest, let's get in touch!
 		</p>
 
-		<div class="contact-links">
+		<div class="contact-links bend">
 			<a href="mailto:mthelm85@gmail.com" class="contact-link">
 				<span class="contact-link-label mono-label">Email</span>
 				<span class="contact-link-value">mthelm85@gmail.com</span>
@@ -26,7 +26,7 @@
 			</a>
 		</div>
 
-		<footer class="site-footer">
+		<footer class="site-footer bend">
 			<div class="footer-line">
 				<span class="mono-label">matthelm.pro</span>
 			</div>

@@ -5,9 +5,9 @@
 
 <section id="projects" class="section" aria-labelledby="projects-heading">
 	<div class="section-inner">
-		<h2 id="projects-heading" class="section-heading">Fun Stuff</h2>
+		<h2 id="projects-heading" class="section-heading bend">Fun Stuff</h2>
 
-		<p class="section-intro">
+		<p class="section-intro bend">
 			Games, notebooks, blogs, and tools — things built for the love of the problem.
 		</p>
 

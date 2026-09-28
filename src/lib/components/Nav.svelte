@@ -41,22 +41,6 @@
 			rgba(var(--color-bg-rgb), 0.9) 0%,
 			rgba(var(--color-bg-rgb), 0) 100%
 		);
-		backdrop-filter: blur(1px);
-	}
-
-	.nav-bar::after {
-		content: '';
-		position: absolute;
-		top: 100%;
-		left: 0;
-		right: 0;
-		height: 80px;
-		background: linear-gradient(
-			to bottom,
-			rgba(var(--color-bg-rgb), 0.12) 0%,
-			rgba(var(--color-bg-rgb), 0) 100%
-		);
-		pointer-events: none;
 	}
 
 	.nav-link {
