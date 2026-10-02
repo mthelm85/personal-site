@@ -5,6 +5,7 @@
 	import { graphJsonLd } from '$lib/data/graph';
 
 	import FlowField from '$lib/flow/FlowField.svelte';
+	import Dissolve from '$lib/flow/Dissolve.svelte';
 	import About from '$lib/sections/About.svelte';
 	import Projects from '$lib/sections/Projects.svelte';
 	import Experience from '$lib/sections/Experience.svelte';
@@ -53,6 +54,8 @@
 </svelte:head>
 
 <FlowField />
+<!-- Content marked data-dissolve breaks up into the field's digits as it scrolls away -->
+<Dissolve />
 
 <section id="hero" class="hero">
 	<h1 class="sr-only">Matt Helm</h1>

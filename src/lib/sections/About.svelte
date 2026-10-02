@@ -10,16 +10,16 @@
 
 <section id="about" class="section" aria-labelledby="about-heading">
 	<div class="section-inner">
-		<h2 id="about-heading" class="section-heading bend">About</h2>
+		<h2 id="about-heading" class="section-heading" data-dissolve>About</h2>
 
 		<div class="about-prose">
 			{#each PARAGRAPHS as paragraph}
-				<p class="bend">{paragraph}</p>
+				<p data-dissolve>{paragraph}</p>
 			{/each}
 		</div>
 
 		<div class="skills-grid">
-			<div class="skills-group bend">
+			<div class="skills-group" data-dissolve>
 				<div class="mono-label" style="margin-bottom: 13px;">Languages & Tools</div>
 				<div class="skill-list">
 					{#each SKILLS as skill}
@@ -28,7 +28,7 @@
 				</div>
 			</div>
 
-			<div class="skills-group bend">
+			<div class="skills-group" data-dissolve>
 				<div class="mono-label" style="margin-bottom: 13px;">Domains</div>
 				<div class="skill-list">
 					{#each DOMAINS as domain}

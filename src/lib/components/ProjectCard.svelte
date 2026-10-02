@@ -25,8 +25,8 @@
 	}
 </script>
 
-<!-- The wrapper carries the scroll bend; the article keeps its own tilt transform. -->
-<div class="card-slot bend">
+<!-- The wrapper carries the scroll dissolve mask, so it never touches the article's own tilt transform. -->
+<div class="card-slot" data-dissolve="whole" data-dissolve-at="0.8">
 <article
 	bind:this={card}
 	class="project-card"

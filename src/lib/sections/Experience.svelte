@@ -4,11 +4,11 @@
 
 <section id="experience" class="section" aria-labelledby="experience-heading">
 	<div class="section-inner">
-		<h2 id="experience-heading" class="section-heading bend">Experience</h2>
+		<h2 id="experience-heading" class="section-heading" data-dissolve>Experience</h2>
 
 		<div class="timeline" role="list">
 			{#each TIMELINE as entry, i}
-				<div class="timeline-entry bend" role="listitem">
+				<div class="timeline-entry" role="listitem" data-dissolve>
 					<!-- Year marker -->
 					<div class="timeline-year" aria-hidden="true">
 						<span>{entry.year}</span>
@@ -50,7 +50,7 @@
 	}
 
 	/* The rail is drawn per entry (not once on .timeline) so each segment
-	   bends away with its entry. Padding, not margin, keeps it continuous. */
+	   dissolves with its entry. Padding, not margin, keeps it continuous. */
 	.timeline-entry::before {
 		content: '';
 		position: absolute;

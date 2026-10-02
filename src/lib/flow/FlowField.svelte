@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { currentEquation, replMode } from '$lib/stores/repl';
+	import { ambientAngle } from './ambient';
 
 	type FieldFn = (x: number, y: number) => number;
 
@@ -437,10 +438,7 @@
 			let vy = Math.sin(ang) * p.s * 1.3 * swirlF * speedF + p.s * biasV * speedF;
 
 			if (progress > 0) {
-				const angA =
-					Math.sin(p.x * 0.0022 + t * 0.12 + p.ph * 0.4) * 1.7 +
-					Math.cos(p.y * 0.0026 - t * 0.09 + p.ph * 0.2) * 1.7 +
-					Math.sin((p.x * 0.62 + p.y) * 0.0014 + t * 0.07 + depth) * 1.1;
+				const angA = ambientAngle(p.x, p.y, t, p.ph, depth);
 				const vxA = Math.cos(angA) * p.s * 0.6;
 				const vyA = Math.sin(angA) * p.s * 0.6 + p.s * 0.18;
 				vx = vx * (1 - progress) + vxA * progress;
