@@ -1,10 +1,24 @@
 import { PROJECTS } from './projects';
 import { TIMELINE } from './timeline';
-import { IDENTITY, SKILLS, DOMAINS, SITE_URL } from './identity';
+import { IDENTITY, SKILLS, DOMAINS, SITE_URL, TERM_IRIS, OCCUPATION } from './identity';
 
 const PERSON_ID = `${SITE_URL}#me`;
 
 const LANGUAGES = new Set(['Julia', 'Rust', 'Python', 'TypeScript', 'JavaScript', 'SQL', 'R']);
+
+/** A skill or domain label, upgraded to a DefinedTerm linked to authoritative
+ *  vocabularies (Wikidata, ESCO) when TERM_IRIS has a match. */
+function knowledgeTerm(label: string) {
+	const sameAs = TERM_IRIS[label];
+	return sameAs ? { '@type': 'DefinedTerm', name: label, sameAs } : label;
+}
+
+// Fail the build if a mapping outlives a renamed or removed label.
+for (const label of Object.keys(TERM_IRIS)) {
+	if (!SKILLS.includes(label) && !DOMAINS.includes(label)) {
+		throw new Error(`TERM_IRIS has no matching skill or domain: ${label}`);
+	}
+}
 
 /**
  * Assemble the site's schema.org graph (JSON-LD) from the same data files
@@ -23,7 +37,22 @@ export function buildGraph() {
 			url: IDENTITY.employer.url
 		},
 		sameAs: IDENTITY.sameAs,
-		knowsAbout: [...DOMAINS, ...SKILLS.filter((s) => LANGUAGES.has(s))],
+		hasOccupation: {
+			'@type': 'Occupation',
+			name: OCCUPATION.name,
+			occupationalCategory: {
+				'@type': 'CategoryCode',
+				codeValue: OCCUPATION.onetSoc,
+				url: `https://www.onetonline.org/link/summary/${OCCUPATION.onetSoc}`,
+				inCodeSet: {
+					'@type': 'CategoryCodeSet',
+					name: 'O*NET-SOC 2019 Taxonomy',
+					url: 'https://www.onetcenter.org/taxonomy.html'
+				}
+			},
+			sameAs: OCCUPATION.sameAs
+		},
+		knowsAbout: [...DOMAINS, ...SKILLS.filter((s) => LANGUAGES.has(s))].map(knowledgeTerm),
 		alumniOf: TIMELINE.filter((e) => e.type === 'education').map((e) => ({
 			'@type': 'CollegeOrUniversity',
 			name: e.organization
