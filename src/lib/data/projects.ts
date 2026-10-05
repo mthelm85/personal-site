@@ -12,7 +12,7 @@ export const PROJECTS: Project[] = [
 		description:
 			'A quick introduction to RDF and how it can help reduce friction in labor markets.',
 		tech: ['RDF', 'D3.js', 'SvelteKit'],
-		github: 'https://mthelm85.github.io/rdf-explainer/'
+		link: 'https://mthelm85.github.io/rdf-explainer/'
 	},
 	{
 		title: 'RDF.jl',
