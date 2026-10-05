@@ -8,11 +8,11 @@ export interface Project {
 
 export const PROJECTS: Project[] = [
 	{
-		title: 'Knowledge Graph Embeddings for Occupational Mobility',
+		title: 'Primer on RDF',
 		description:
-			'Finding career pathways in O*NET data that traditional similarity methods cannot.',
-		tech: ['Julia', 'KGE', 'Lux.jl', 'CUDA'],
-		link: 'https://mthelm85.github.io/onet-occ-mobility/'
+			'A quick introduction to RDF and how it can help reduce friction in labor markets.',
+		tech: ['RDF', 'D3.js', 'SvelteKit'],
+		github: 'https://mthelm85.github.io/rdf-explainer/'
 	},
 	{
 		title: 'RDF.jl',
@@ -46,6 +46,13 @@ export const PROJECTS: Project[] = [
 		description: 'A brief primer on Kernel Density Estimation.',
 		tech: ['JavaScript', 'Observable'],
 		link: 'https://observablehq.com/d/bf068f6a5c4da2ce'
+	},
+		{
+		title: 'Knowledge Graph Embeddings for Occupational Mobility',
+		description:
+			'Finding career pathways in O*NET data that traditional similarity methods cannot.',
+		tech: ['Julia', 'KGE', 'Lux.jl', 'CUDA'],
+		link: 'https://mthelm85.github.io/onet-occ-mobility/'
 	},
 	{
 		title: 'Homeward Bound',
@@ -87,12 +94,5 @@ export const PROJECTS: Project[] = [
 			'The travelling salesman problem, as an arcade game. Each level is generated randomly and then solved with simulated annealing.',
 		tech: ['JavaScript', 'Phaser.js', 'Simulated Annealing'],
 		link: 'https://mthelm85.github.io/travelling-salesman-game/'
-	},
-	{
-		title: 'TerraStat.jl',
-		description:
-			'Julia package for pulling BLS economic data based on custom geospatial shapes. Draw a region, get the data.',
-		tech: ['Julia', 'BLS API', 'Geospatial'],
-		github: 'https://github.com/mthelm85/TerraStat.jl'
 	}
 ];
