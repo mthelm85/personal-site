@@ -8,6 +8,21 @@ export interface Project {
 
 export const PROJECTS: Project[] = [
 	{
+		title: 'Nomograms.jl',
+		description:
+			'A Julia package for turning formulas into analog calculator charts, solving them numerically, and drawing them as SVG',
+		tech: ['Julia', 'Numerical Computing', 'Data Visualization'],
+		link: 'https://mthelm85.github.io/Nomograms.jl/dev/',
+		github: 'https://github.com/mthelm85/Nomograms.jl'
+	},
+	{
+		title: 'Virtual Soroban',
+		description:
+			'An interactive soroban learning app that steps through soroban abacus calculations, explaining bead movements and mental arithmetic strategies.',
+		tech: ['JavaScript', 'Education', 'Soroban'],
+		link: 'https://mthelm85.github.io/soroban/'
+	},
+	{
 		title: 'Primer on RDF',
 		description:
 			'A quick introduction to RDF and how it can help reduce friction in labor markets.',
