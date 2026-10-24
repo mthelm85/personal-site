@@ -4,34 +4,268 @@
 <https://matthelm.pro/#me>
     a schema:Person, foaf:Person ;
     schema:name "Matt Helm" ;
-    foaf:name "Matt Helm" ;
     schema:url <https://matthelm.pro/> ;
-    foaf:homepage <https://matthelm.pro/> ;
     schema:jobTitle "Data Scientist" ;
     schema:worksFor [
         a schema:GovernmentOrganization ;
         schema:name "U.S. Department of Labor" ;
         schema:url <https://www.dol.gov/>
     ] ;
-    schema:sameAs <https://github.com/mthelm85>,
-        <https://discourse.julialang.org/u/mthelm85> ;
-    foaf:account <https://github.com/mthelm85>,
-        <https://discourse.julialang.org/u/mthelm85> ;
-    schema:knowsAbout "Agentic AI (MCP)", "Causal Inference",
-        "Optimization & Simulation", "Labor Economics",
-        "Geospatial Analytics", "Workforce Forecasting",
-        "Statistical Modeling", "Regulatory Compliance",
-        "Julia", "Rust", "Python", "TypeScript", "SQL", "R" ;
+    schema:sameAs <https://github.com/mthelm85>, <https://discourse.julialang.org/u/mthelm85> ;
+    schema:hasOccupation [
+        a schema:Occupation ;
+        schema:name "Data Scientist" ;
+        schema:occupationalCategory [
+            a schema:CategoryCode ;
+            schema:codeValue "15-2051.00" ;
+            schema:url <https://www.onetonline.org/link/summary/15-2051.00> ;
+            schema:inCodeSet [
+                a schema:CategoryCodeSet ;
+                schema:name "O*NET-SOC 2019 Taxonomy" ;
+                schema:url <https://www.onetcenter.org/taxonomy.html>
+            ]
+        ] ;
+        schema:sameAs <http://data.europa.eu/esco/occupation/258e46f9-0075-4a2e-adae-1ff0477e0f30>, <http://www.wikidata.org/entity/Q29169143>
+    ] ;
+    schema:knowsAbout "Agentic AI (MCP)", [
+        a schema:DefinedTerm ;
+        schema:name "Causal Inference" ;
+        schema:sameAs <http://www.wikidata.org/entity/Q5054566>
+    ], "Optimization & Simulation", [
+        a schema:DefinedTerm ;
+        schema:name "Labor Economics" ;
+        schema:sameAs <http://www.wikidata.org/entity/Q28161>
+    ], [
+        a schema:DefinedTerm ;
+        schema:name "Geospatial Analytics" ;
+        schema:sameAs <http://www.wikidata.org/entity/Q1938983>
+    ], "Workforce Forecasting", [
+        a schema:DefinedTerm ;
+        schema:name "Statistical Modeling" ;
+        schema:sameAs <http://www.wikidata.org/entity/Q3284399>
+    ], [
+        a schema:DefinedTerm ;
+        schema:name "Regulatory Compliance" ;
+        schema:sameAs <http://www.wikidata.org/entity/Q626741>
+    ], [
+        a schema:DefinedTerm ;
+        schema:name "Julia" ;
+        schema:sameAs <http://www.wikidata.org/entity/Q2613697>
+    ], [
+        a schema:DefinedTerm ;
+        schema:name "Rust" ;
+        schema:sameAs <http://www.wikidata.org/entity/Q575650>
+    ], [
+        a schema:DefinedTerm ;
+        schema:name "Python" ;
+        schema:sameAs <http://www.wikidata.org/entity/Q28865>, <http://data.europa.eu/esco/skill/ccd0a1d9-afda-43d9-b901-96344886e14d>
+    ], [
+        a schema:DefinedTerm ;
+        schema:name "TypeScript" ;
+        schema:sameAs <http://www.wikidata.org/entity/Q978185>, <http://data.europa.eu/esco/skill/867137fb-ff1b-4ca3-99f3-cb6969aa2c68>
+    ], [
+        a schema:DefinedTerm ;
+        schema:name "SQL" ;
+        schema:sameAs <http://www.wikidata.org/entity/Q47607>, <http://data.europa.eu/esco/skill/598de5b0-5b58-4ea7-8058-a4bc4d18c742>
+    ], [
+        a schema:DefinedTerm ;
+        schema:name "R" ;
+        schema:sameAs <http://www.wikidata.org/entity/Q206904>, <http://data.europa.eu/esco/skill/51586df8-1c46-4b47-8583-773cb63bf00b>
+    ] ;
     schema:alumniOf [
         a schema:CollegeOrUniversity ;
         schema:name "West Texas A&M University"
     ], [
         a schema:CollegeOrUniversity ;
         schema:name "University of West Florida"
-    ] .
+    ] ;
+    foaf:name "Matt Helm" ;
+    foaf:homepage <https://matthelm.pro/> ;
+    foaf:account <https://github.com/mthelm85>, <https://discourse.julialang.org/u/mthelm85> .
 
 <https://matthelm.pro/#website>
     a schema:WebSite ;
     schema:url <https://matthelm.pro/> ;
     schema:name "Matt Helm — Data Scientist" ;
     schema:author <https://matthelm.pro/#me> .
+
+<https://matthelm.pro/>
+    a schema:ProfilePage ;
+    schema:url <https://matthelm.pro/> ;
+    schema:name "Matt Helm — Data Scientist" ;
+    schema:isPartOf <https://matthelm.pro/#website> ;
+    schema:mainEntity <https://matthelm.pro/#me> .
+
+<https://matthelm.pro/#projects>
+    a schema:ItemList ;
+    schema:name "Projects" ;
+    schema:itemListElement [
+        a schema:ListItem ;
+        schema:position 1 ;
+        schema:item [
+            a schema:SoftwareSourceCode ;
+            schema:name "Nomograms.jl" ;
+            schema:description "A Julia package for turning formulas into analog calculator charts, solving them numerically, and drawing them as SVG" ;
+            schema:keywords "Julia, Numerical Computing, Data Visualization" ;
+            schema:codeRepository <https://github.com/mthelm85/Nomograms.jl> ;
+            schema:programmingLanguage "Julia" ;
+            schema:url <https://mthelm85.github.io/Nomograms.jl/dev/> ;
+            schema:author <https://matthelm.pro/#me>
+        ]
+    ], [
+        a schema:ListItem ;
+        schema:position 2 ;
+        schema:item [
+            a schema:CreativeWork ;
+            schema:name "Virtual Soroban" ;
+            schema:description "An interactive soroban learning app that steps through soroban abacus calculations, explaining bead movements and mental arithmetic strategies." ;
+            schema:keywords "JavaScript, Education, Soroban" ;
+            schema:url <https://mthelm85.github.io/soroban/> ;
+            schema:author <https://matthelm.pro/#me>
+        ]
+    ], [
+        a schema:ListItem ;
+        schema:position 3 ;
+        schema:item [
+            a schema:CreativeWork ;
+            schema:name "Primer on RDF" ;
+            schema:description "A quick introduction to RDF and how it can help reduce friction in labor markets." ;
+            schema:keywords "RDF, D3.js, SvelteKit" ;
+            schema:url <https://mthelm85.github.io/rdf-explainer/> ;
+            schema:author <https://matthelm.pro/#me>
+        ]
+    ], [
+        a schema:ListItem ;
+        schema:position 4 ;
+        schema:item [
+            a schema:SoftwareSourceCode ;
+            schema:name "RDF.jl" ;
+            schema:description "A full-featured RDF 1.2 library for Julia with a conformant SPARQL 1.1 and 1.2 engine" ;
+            schema:keywords "Julia, RDF, SPARQL" ;
+            schema:codeRepository <https://github.com/mthelm85/RDF.jl> ;
+            schema:programmingLanguage "Julia" ;
+            schema:author <https://matthelm.pro/#me>
+        ]
+    ], [
+        a schema:ListItem ;
+        schema:position 5 ;
+        schema:item [
+            a schema:SoftwareSourceCode ;
+            schema:name "CheckMate.jl" ;
+            schema:description "A lightweight data validation framework for Julia, designed to help you define, run, and manage data quality checks on tabular data." ;
+            schema:keywords "Julia, Data Validation, ETL" ;
+            schema:codeRepository <https://github.com/mthelm85/CheckMate.jl> ;
+            schema:programmingLanguage "Julia" ;
+            schema:author <https://matthelm.pro/#me>
+        ]
+    ], [
+        a schema:ListItem ;
+        schema:position 6 ;
+        schema:item [
+            a schema:CreativeWork ;
+            schema:name "The Data Dispatch" ;
+            schema:description "A blog focusing on interesting and unique data sources." ;
+            schema:keywords "Vue.js, Nuxt.js, Julia, Chart.js" ;
+            schema:url <https://www.thedatadispatch.com> ;
+            schema:author <https://matthelm.pro/#me>
+        ]
+    ], [
+        a schema:ListItem ;
+        schema:position 7 ;
+        schema:item [
+            a schema:CreativeWork ;
+            schema:name "Bayesian Regression With an Ordered Categorical Predictor Variable" ;
+            schema:description "Bayesian regression analysis of the incremental effects of educational attainment on income." ;
+            schema:keywords "Julia, Turing.jl" ;
+            schema:url <https://forem.julialang.org/mthelm85/bayesian-regression-with-an-ordered-categorical-predictor-variable-ejc> ;
+            schema:author <https://matthelm.pro/#me>
+        ]
+    ], [
+        a schema:ListItem ;
+        schema:position 8 ;
+        schema:item [
+            a schema:CreativeWork ;
+            schema:name "Kernel Density Estimation" ;
+            schema:description "A brief primer on Kernel Density Estimation." ;
+            schema:keywords "JavaScript, Observable" ;
+            schema:url <https://observablehq.com/d/bf068f6a5c4da2ce> ;
+            schema:author <https://matthelm.pro/#me>
+        ]
+    ], [
+        a schema:ListItem ;
+        schema:position 9 ;
+        schema:item [
+            a schema:CreativeWork ;
+            schema:name "Knowledge Graph Embeddings for Occupational Mobility" ;
+            schema:description "Finding career pathways in O*NET data that traditional similarity methods cannot." ;
+            schema:keywords "Julia, KGE, Lux.jl, CUDA" ;
+            schema:url <https://mthelm85.github.io/onet-occ-mobility/> ;
+            schema:author <https://matthelm.pro/#me>
+        ]
+    ], [
+        a schema:ListItem ;
+        schema:position 10 ;
+        schema:item [
+            a schema:CreativeWork ;
+            schema:name "Homeward Bound" ;
+            schema:description "A physics-based puzzle game challenging players to navigate a spacecraft through complex gravitational fields using realistic n-body gravitational simulations." ;
+            schema:keywords "Phaser.js, Vue.js, JavaScript" ;
+            schema:url <https://homeward-bound-game.vercel.app/> ;
+            schema:author <https://matthelm.pro/#me>
+        ]
+    ], [
+        a schema:ListItem ;
+        schema:position 11 ;
+        schema:item [
+            a schema:CreativeWork ;
+            schema:name "Optimal Meatballs" ;
+            schema:description "Learn about circle packing by optimizing the size of meatballs! A featured notebook on plutojl.org." ;
+            schema:keywords "Julia, Pluto.jl, Optimization" ;
+            schema:url <https://featured.plutojl.org/puzzles-games/optimal%20meatballs> ;
+            schema:author <https://matthelm.pro/#me>
+        ]
+    ], [
+        a schema:ListItem ;
+        schema:position 12 ;
+        schema:item [
+            a schema:CreativeWork ;
+            schema:name "Calculus" ;
+            schema:description "An interactive notebook that clearly demonstrates the fundamental concepts of calculus. Learn and understand limits, continuity, derivatives and integrals in 30 minutes or less." ;
+            schema:keywords "JavaScript, Observable Framework, Education" ;
+            schema:url <https://mthelm85.github.io/calculus/> ;
+            schema:author <https://matthelm.pro/#me>
+        ]
+    ], [
+        a schema:ListItem ;
+        schema:position 13 ;
+        schema:item [
+            a schema:CreativeWork ;
+            schema:name "Linear Algebra" ;
+            schema:description "A crash course in linear algebra." ;
+            schema:keywords "JavaScript, Observable Framework, Education" ;
+            schema:url <https://mthelm85.github.io/linear-algebra/> ;
+            schema:author <https://matthelm.pro/#me>
+        ]
+    ], [
+        a schema:ListItem ;
+        schema:position 14 ;
+        schema:item [
+            a schema:CreativeWork ;
+            schema:name "County Clustering" ;
+            schema:description "Clusters U.S. counties within a state according to industrial similarities using k-medoids and fuzzy c-means clustering algorithms." ;
+            schema:keywords "Julia, Pluto.jl, Clustering" ;
+            schema:url <https://www.matthelm.pro/clusteringStatic.html> ;
+            schema:author <https://matthelm.pro/#me>
+        ]
+    ], [
+        a schema:ListItem ;
+        schema:position 15 ;
+        schema:item [
+            a schema:CreativeWork ;
+            schema:name "The Travelling Salesman Game" ;
+            schema:description "The travelling salesman problem, as an arcade game. Each level is generated randomly and then solved with simulated annealing." ;
+            schema:keywords "JavaScript, Phaser.js, Simulated Annealing" ;
+            schema:url <https://mthelm85.github.io/travelling-salesman-game/> ;
+            schema:author <https://matthelm.pro/#me>
+        ]
+    ] .
