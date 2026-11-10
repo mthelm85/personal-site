@@ -20,7 +20,7 @@ export const TIMELINE: TimelineEntry[] = [
 		title: 'Staff Data Scientist',
 		organization: 'U.S. Department of Labor, Wage & Hour Division',
 		description:
-			'Architect and deploy production-grade tools across the full data pipeline — from document retrieval systems in Rust (approved for DOL\'s Certified Software List) to constrained optimization models in JuMP.jl for national labor-allocation problems. Design and execute causal inference studies, Monte Carlo performance models, predictive models, time series modeling, and much more.',
+			'Architect and deploy production-grade tools across the full data pipeline — from data retrieval systems in Rust (approved for DOL\'s Certified Software List) to constrained optimization models in JuMP.jl for national labor-allocation problems. Design and execute causal inference studies, Monte Carlo performance models, predictive models, time series modeling, and much more.',
 		type: 'work'
 	},
 	{
