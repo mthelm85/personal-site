@@ -8,6 +8,12 @@ export interface Project {
 
 export const PROJECTS: Project[] = [
 	{
+		title: 'Normally Abnormal',
+		description: 'An essay series on why real-world data so rarely follow a bell curve, and what to do about it.',
+		tech: ['Statistics', 'Data Visualization', 'Simulation', 'Julia', 'Svelte'],
+		link: 'https://mthelm85.github.io/normally-abnormal/'
+	},
+	{
 		title: 'Nomograms.jl',
 		description:
 			'A Julia package for turning formulas into analog calculator charts, solving them numerically, and drawing them as SVG',
