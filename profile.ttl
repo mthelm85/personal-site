@@ -103,6 +103,17 @@
         a schema:ListItem ;
         schema:position 1 ;
         schema:item [
+            a schema:CreativeWork ;
+            schema:name "Normally Abnormal" ;
+            schema:description "An essay series on why real-world data so rarely follow a bell curve, and what to do about it." ;
+            schema:keywords "Statistics, Data Visualization, Simulation, Julia, Svelte" ;
+            schema:url <https://mthelm85.github.io/normally-abnormal/> ;
+            schema:author <https://matthelm.pro/#me>
+        ]
+    ], [
+        a schema:ListItem ;
+        schema:position 2 ;
+        schema:item [
             a schema:SoftwareSourceCode ;
             schema:name "Nomograms.jl" ;
             schema:description "A Julia package for turning formulas into analog calculator charts, solving them numerically, and drawing them as SVG" ;
@@ -114,7 +125,7 @@
         ]
     ], [
         a schema:ListItem ;
-        schema:position 2 ;
+        schema:position 3 ;
         schema:item [
             a schema:CreativeWork ;
             schema:name "Virtual Soroban" ;
@@ -125,7 +136,7 @@
         ]
     ], [
         a schema:ListItem ;
-        schema:position 3 ;
+        schema:position 4 ;
         schema:item [
             a schema:CreativeWork ;
             schema:name "Primer on RDF" ;
@@ -136,7 +147,7 @@
         ]
     ], [
         a schema:ListItem ;
-        schema:position 4 ;
+        schema:position 5 ;
         schema:item [
             a schema:SoftwareSourceCode ;
             schema:name "RDF.jl" ;
@@ -148,7 +159,7 @@
         ]
     ], [
         a schema:ListItem ;
-        schema:position 5 ;
+        schema:position 6 ;
         schema:item [
             a schema:SoftwareSourceCode ;
             schema:name "CheckMate.jl" ;
@@ -160,7 +171,7 @@
         ]
     ], [
         a schema:ListItem ;
-        schema:position 6 ;
+        schema:position 7 ;
         schema:item [
             a schema:CreativeWork ;
             schema:name "The Data Dispatch" ;
@@ -171,7 +182,7 @@
         ]
     ], [
         a schema:ListItem ;
-        schema:position 7 ;
+        schema:position 8 ;
         schema:item [
             a schema:CreativeWork ;
             schema:name "Bayesian Regression With an Ordered Categorical Predictor Variable" ;
@@ -182,7 +193,7 @@
         ]
     ], [
         a schema:ListItem ;
-        schema:position 8 ;
+        schema:position 9 ;
         schema:item [
             a schema:CreativeWork ;
             schema:name "Kernel Density Estimation" ;
@@ -193,7 +204,7 @@
         ]
     ], [
         a schema:ListItem ;
-        schema:position 9 ;
+        schema:position 10 ;
         schema:item [
             a schema:CreativeWork ;
             schema:name "Knowledge Graph Embeddings for Occupational Mobility" ;
@@ -204,7 +215,7 @@
         ]
     ], [
         a schema:ListItem ;
-        schema:position 10 ;
+        schema:position 11 ;
         schema:item [
             a schema:CreativeWork ;
             schema:name "Homeward Bound" ;
@@ -215,7 +226,7 @@
         ]
     ], [
         a schema:ListItem ;
-        schema:position 11 ;
+        schema:position 12 ;
         schema:item [
             a schema:CreativeWork ;
             schema:name "Optimal Meatballs" ;
@@ -226,7 +237,7 @@
         ]
     ], [
         a schema:ListItem ;
-        schema:position 12 ;
+        schema:position 13 ;
         schema:item [
             a schema:CreativeWork ;
             schema:name "Calculus" ;
@@ -237,7 +248,7 @@
         ]
     ], [
         a schema:ListItem ;
-        schema:position 13 ;
+        schema:position 14 ;
         schema:item [
             a schema:CreativeWork ;
             schema:name "Linear Algebra" ;
@@ -248,7 +259,7 @@
         ]
     ], [
         a schema:ListItem ;
-        schema:position 14 ;
+        schema:position 15 ;
         schema:item [
             a schema:CreativeWork ;
             schema:name "County Clustering" ;
@@ -259,7 +270,7 @@
         ]
     ], [
         a schema:ListItem ;
-        schema:position 15 ;
+        schema:position 16 ;
         schema:item [
             a schema:CreativeWork ;
             schema:name "The Travelling Salesman Game" ;
